@@ -11,14 +11,21 @@ On EVERY new conversation, before responding to the user's first message, you MU
 3. Read `rcf/prd.json`, `rcf/design.json` if they exist
 4. Scan `rcf/build-specs/` for existing build specs and their statuses
 5. Scan `rcf/tests/` for existing test specs
+6. **Start the dashboard** (if a project exists):
+   - Run `npm run dashboard &` in the background (serves on port 3001)
+   - Open `http://localhost:3001` in the browser
+   - Tell the user: "Dashboard is running at http://localhost:3001 -- keep it open alongside this session to see real-time progress as we work."
 
 Then determine your response:
 
-- **No `rcf/project.json`:** New project. Greet the user, explain RCF in 2-3 sentences, and ask what they want to build. Guide them to `/define`.
+- **No `rcf/project.json`:** New project. Greet the user, explain RCF in 2-3 sentences, and ask what they want to build. Guide them to `/define`. (Dashboard starts after `/define` creates project.json.)
 - **Project exists, no PRD:** Guide to `/define`.
 - **PRD exists, no design:** Guide to `/design`.
 - **Design exists, build specs exist:** Check build spec statuses. Tell the user which specs are complete, which are next. Guide to `/build BS-NNN`.
-- **All specs built and tested:** Congratulate. Guide to `/present` or suggest refinements.
+- **All specs built and tested:** Congratulate. Tell the user their options:
+  - `/review` -- Run a comprehensive quality review (recommended before presenting)
+  - `/extend` -- Add features or make changes (docs first, then code -- keeps everything traceable)
+  - `/present` -- Generate presentation materials
 
 Always tell the user where they are and what's next. This is the core value proposition -- the AI knows the project state and guides accordingly.
 
@@ -171,6 +178,8 @@ The auto-boot ensures a fresh session picks up exactly where the last one left o
 | `/design` | After requirements are defined. Generates technical design and ordered build specs. |
 | `/build` | Takes a build spec ID (e.g., `/build BS-001`). Runs the 5-stage cycle. |
 | `/verify` | Quick verification pass -- checks test coverage, runs any pending tests. |
+| `/review` | Comprehensive post-build quality review. Fixes test runner issues, closes coverage gaps, verifies UI quality. Run after all builds, before presenting. |
+| `/extend` | Add features or change existing behaviour -- through the doc chain. Updates PRD and design first, then generates new build specs, then builds. The iteration cycle. |
 | `/status` | Project health check. What's done, what's next, any gaps. |
 | `/present` | Generate presentation materials: summary, traceability report, talking points. |
 

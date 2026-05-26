@@ -24,7 +24,9 @@ Guide the user through defining their product idea and generating a structured P
 
 5. **Save.** Write the final PRD to `rcf/prd.json`. Create `rcf/project.json` if it doesn't exist (set phase to "defined"). Commit with message: `feat: define PRD with N requirements`.
 
-6. **Guide forward.** Tell the user: "Requirements are locked. Run `/design` to generate the technical design and build specs."
+6. **Start the dashboard.** Run `npm run dashboard &` in the background and open `http://localhost:3001` in the browser. Tell the user: "Dashboard is running at http://localhost:3001 -- keep it open to track progress as we build."
+
+7. **Guide forward.** Tell the user: "Requirements are locked. Run `/design` to generate the technical design and build specs."
 
 ## Workshop mode -- individual component builds
 
