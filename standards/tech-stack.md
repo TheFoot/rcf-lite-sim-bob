@@ -67,6 +67,19 @@ These are included in `package.json` and available for use when the PRD requires
 
 If additional packages are needed, install via `npm install <package>` and document the justification.
 
+## Local-only -- no shared infrastructure
+
+Everything runs on the developer's laptop. This is a hard constraint.
+
+- **No external APIs.** No calls to cloud services, third-party APIs, or remote endpoints. If the feature needs data, generate mock data locally.
+- **No databases.** Use flat JSON files in a `data/` directory for persistence. Read/write with `node:fs`.
+- **No Docker or containers.** Plain Node.js process, started with `npm run dev`.
+- **No authentication or OAuth.** No login flows, no API keys, no tokens.
+- **No required environment variables.** `PORT` is optional (defaults to 3000). Everything else has sensible hardcoded defaults.
+- **No network dependencies at runtime.** The app must work fully offline after `npm install`.
+
+If a feature requires data that would normally come from an external service, create a `data/seed.json` with realistic mock data and load it on startup.
+
 ## What NOT to use
 
 - No TypeScript (adds a build step).

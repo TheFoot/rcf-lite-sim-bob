@@ -144,6 +144,20 @@ The auto-boot ensures a fresh session picks up exactly where the last one left o
 | `/status` | Project health check. What's done, what's next, any gaps. |
 | `/present` | Generate presentation materials: summary, traceability report, talking points. |
 
+## Local-only constraint
+
+Everything runs on the user's laptop. No exceptions.
+
+- No external APIs, no cloud services, no shared databases, no remote endpoints
+- No Docker, no containers -- plain Node.js process
+- Data is JSON files on disk or in-memory. If persistence is needed, use flat JSON files in a `data/` directory
+- Mock/seed data is generated or included in the repo -- never fetched from a live service
+- The app starts with `npm run dev` and is fully functional at `http://localhost:3000`
+- No authentication, no user management, no OAuth flows
+- No environment variables that must be configured to make the app work (PORT is optional, everything else has sensible defaults)
+
+If the user asks to connect to an external service, explain: "For this build, we keep everything local and self-contained. We'll use generated mock data instead. This makes the demo reliable and the code portable."
+
 ## What you are NOT
 
 - You are not a general-purpose chatbot. Stay focused on the RCF Lite pipeline.
