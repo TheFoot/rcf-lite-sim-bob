@@ -888,8 +888,8 @@
       const { project } = projectData;
       if (!project) return;
 
-      document.getElementById('projectName').textContent = project.name || 'RCF Dashboard';
-      document.title = `${project.name || 'RCF Dashboard'} - Dashboard`;
+      document.getElementById('projectName').textContent = 'RCF Project Dashboard';
+      document.title = `${project.name || 'Project'} -- RCF Dashboard`;
 
       const badge = document.getElementById('phaseBadge');
       badge.dataset.phase = project.phase || 'new';
@@ -975,8 +975,11 @@
       };
 
       for (const req of prd.requirements) {
-        // Find build specs for this requirement
-        const reqSpecs = (buildSpecs || []).filter(bs => bs.requirement === req.id);
+        // Find build specs for this requirement (requirement can be a string or array)
+        const reqSpecs = (buildSpecs || []).filter(bs => {
+          const reqs = Array.isArray(bs.requirement) ? bs.requirement : [bs.requirement];
+          return reqs.includes(req.id);
+        });
 
         // Count total AC and passing tests
         const totalAc = (req.stories || []).reduce((sum, s) => sum + (s.acceptanceCriteria?.length || 0), 0);
@@ -1100,12 +1103,18 @@
         return;
       }
 
-      // Build lookup maps
+      // Build lookup maps (requirement and story can be string or array)
       const bsByReqStory = {};
       for (const bs of (buildSpecs || [])) {
-        const key = `${bs.requirement}/${bs.story}`;
-        if (!bsByReqStory[key]) bsByReqStory[key] = [];
-        bsByReqStory[key].push(bs);
+        const reqs = Array.isArray(bs.requirement) ? bs.requirement : [bs.requirement];
+        const stories = Array.isArray(bs.story) ? bs.story : [bs.story];
+        for (const r of reqs) {
+          for (const s of stories) {
+            const key = `${r}/${s}`;
+            if (!bsByReqStory[key]) bsByReqStory[key] = [];
+            bsByReqStory[key].push(bs);
+          }
+        }
       }
 
       const bsById = {};
@@ -1288,7 +1297,10 @@
     function countPassingTestsForReq(reqId) {
       const { testSpecs, buildSpecs } = projectData;
       if (!testSpecs || !buildSpecs) return 0;
-      const reqBsIds = new Set(buildSpecs.filter(bs => bs.requirement === reqId).map(bs => bs.id));
+      const reqBsIds = new Set(buildSpecs.filter(bs => {
+        const reqs = Array.isArray(bs.requirement) ? bs.requirement : [bs.requirement];
+        return reqs.includes(reqId);
+      }).map(bs => bs.id));
       let count = 0;
       for (const ts of testSpecs) {
         if (reqBsIds.has(ts.buildSpec)) {
@@ -1299,7 +1311,10 @@
     }
 
     function getReqColour(req, buildSpecs, testSpecs) {
-      const reqBs = (buildSpecs || []).filter(bs => bs.requirement === req.id);
+      const reqBs = (buildSpecs || []).filter(bs => {
+        const reqs = Array.isArray(bs.requirement) ? bs.requirement : [bs.requirement];
+        return reqs.includes(req.id);
+      });
       if (reqBs.length === 0) return 'grey';
       if (reqBs.every(bs => bs.status === 'verified')) return 'green';
       if (reqBs.some(bs => ['building', 'reviewing', 'testing', 'defining'].includes(bs.status))) return 'orange';
