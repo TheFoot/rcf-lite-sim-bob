@@ -743,35 +743,48 @@
     .tip::after {
       content: attr(data-tip);
       position: absolute;
-      bottom: calc(100% + 6px);
+      bottom: calc(100% + 8px);
       left: 50%;
       transform: translateX(-50%);
-      background: var(--color-primary);
-      color: var(--color-text);
+      background: #111820;
+      color: #e2e8f0;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
-      padding: var(--space-xs) var(--space-sm);
-      font-size: var(--font-size-xs);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 13px;
       font-weight: 400;
-      line-height: 1.4;
-      white-space: nowrap;
-      max-width: 320px;
-      white-space: normal;
+      line-height: 1.5;
+      text-transform: none;
+      letter-spacing: normal;
+      text-align: left;
+      width: max-content;
+      max-width: 340px;
       pointer-events: none;
       opacity: 0;
       transition: opacity 80ms ease;
-      z-index: 50;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 200;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
     }
 
     .tip:hover::after {
       opacity: 1;
     }
 
+    /* Prevent tooltip when data-tip is empty */
+    .tip[data-tip=""]::after {
+      display: none;
+    }
+
     /* Downward variant for header elements */
     .tip--down::after {
       bottom: auto;
-      top: calc(100% + 6px);
+      top: calc(100% + 8px);
+    }
+
+    /* Right-aligned variant for elements near left edge */
+    .tip--right::after {
+      left: 0;
+      transform: none;
     }
 
     /* ---------------------------------------------------------------
@@ -1606,19 +1619,18 @@
       }
       const chainPct = totalReqs > 0 ? Math.round((fullyTracedReqs / totalReqs) * 100) : 0;
 
-      // --- Overall Confidence ---
-      // Requirements depth anchors everything. If the spec is thin,
-      // high build/test numbers just mean you built a thin spec well.
-      const overallPct = Math.round(depthPct * 0.35 + buildPct * 0.15 + testPct * 0.20 + chainPct * 0.30);
+      // --- Production Readiness ---
+      // Capped by requirements depth. You can't be more production-ready
+      // than your spec is deep. Building a thin spec perfectly is still thin.
+      const overallPct = Math.min(depthPct, Math.round(depthPct * 0.4 + buildPct * 0.15 + testPct * 0.15 + chainPct * 0.30));
 
       const circumference = 2 * Math.PI * 48;
 
-      // --- Context-aware notes that surface the gaps ---
+      // --- Context notes: state facts, not methodology pitch ---
       const notes = [];
 
-      // Requirements depth note -- this should almost always fire
       if (depthPct < 80) {
-        notes.push(`<strong>Requirements are lightly specified.</strong> ${totalAc} acceptance criteria across ${totalReqs} requirements (${avgAcPerReq} per req). A production spec would need ~${TARGET_AC_PER_REQ} per requirement to cover edge cases, error handling, and non-functional needs. This is the biggest gap -- and the methodology is surfacing it.`);
+        notes.push(`<strong>Requirements are lightly specified.</strong> ${totalAc} acceptance criteria across ${totalReqs} requirements (${avgAcPerReq} per req). A production-ready spec would typically need ~${TARGET_AC_PER_REQ} per requirement to cover edge cases, error handling, and non-functional concerns. This is the largest gap.`);
       }
 
       if (buildPct < 100) {
@@ -1627,22 +1639,17 @@
 
       if (testPct < 100 && testPct > 0) {
         const untested = totalAc - testedAcIds.size;
-        notes.push(`${untested} acceptance criteria lack passing automated tests. Visual criteria are verified during <code>/review</code>.`);
+        notes.push(`${untested} acceptance criteria lack passing automated tests.`);
       } else if (testPct === 0 && totalAc > 0) {
-        notes.push(`No acceptance criteria have passing automated tests yet. Run <code>/build</code> to generate and execute tests.`);
+        notes.push(`No acceptance criteria have passing automated tests yet.`);
       }
 
       if (chainPct < 100 && totalBs > 0) {
-        notes.push(`${totalReqs - fullyTracedReqs} of ${totalReqs} requirements have incomplete traceability chains. Full chain = every AC has both verified code and a passing test.`);
+        notes.push(`${totalReqs - fullyTracedReqs} of ${totalReqs} requirements have incomplete traceability chains (every AC needs both verified code and a passing test).`);
       }
 
-      // The positive framing -- gaps are features, not bugs
-      if (depthPct < 80 || chainPct < 100) {
-        notes.push(`<em>These gaps are not failures -- they are exactly what the methodology is designed to reveal. A 4-hour workshop builds a working demo, not a production spec. RCF shows you what "done" actually looks like and how far you are from it.</em>`);
-      }
-
-      if (overallPct === 100) {
-        notes.push('Full confidence: every requirement is deeply specified, fully built, tested, and traceable.');
+      if (overallPct < 50) {
+        notes.push(`This project is a working prototype, not a production-ready product. The gaps above show what a production build would need to address: deeper specifications, broader acceptance criteria, non-functional requirements, and comprehensive test coverage.`);
       }
 
       const noteHtml = notes.length > 0
@@ -1656,7 +1663,7 @@
           ${renderGauge(testPct, `Test Coverage (${testedAcIds.size}/${totalAc} AC)`, circumference)}
           <div class="overall-coverage">
             <div class="overall-percent">${overallPct}%</div>
-            <div class="overall-label">Overall Confidence</div>
+            <div class="overall-label">Production Readiness</div>
           </div>
         </div>${noteHtml}`;
     }
@@ -2037,6 +2044,25 @@
             <span class="status-badge tip" data-status="${bs.status}" data-tip="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
           </div>
         </div>`;
+
+      // Build spec content -- the actual spec/prompt
+      if (bs.description || bs.designContext) {
+        html += '<div class="detail-section">';
+        html += '<div class="detail-section-title">Build Specification</div>';
+        if (bs.description) {
+          html += `<p style="font-size: var(--font-size-sm); color: var(--color-text); margin-bottom: var(--space-md); line-height: 1.6;">${esc(bs.description)}</p>`;
+        }
+        if (bs.designContext) {
+          html += `<div style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: var(--space-md); font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.6; font-family: monospace;">
+            <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-accent); margin-bottom: var(--space-xs); text-transform: uppercase; letter-spacing: 0.05em;">Design Context</div>
+            ${esc(bs.designContext)}
+          </div>`;
+        }
+        if (bs.standards && bs.standards.length > 0) {
+          html += `<div style="margin-top: var(--space-sm); font-size: var(--font-size-xs); color: var(--color-text-muted);">Standards applied: ${bs.standards.map(s => `<span style="color: var(--color-accent);">${esc(s)}</span>`).join(', ')}</div>`;
+        }
+        html += '</div>';
+      }
 
       // Linked requirements
       if (linkedReqs.length > 0) {
