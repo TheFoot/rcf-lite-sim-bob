@@ -733,6 +733,48 @@
     }
 
     /* ---------------------------------------------------------------
+       Custom Tooltip (replaces native title)
+       --------------------------------------------------------------- */
+    .tip {
+      position: relative;
+      cursor: help;
+    }
+
+    .tip::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-primary);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-xs);
+      font-weight: 400;
+      line-height: 1.4;
+      white-space: nowrap;
+      max-width: 320px;
+      white-space: normal;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 80ms ease;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .tip:hover::after {
+      opacity: 1;
+    }
+
+    /* Downward variant for header elements */
+    .tip--down::after {
+      bottom: auto;
+      top: calc(100% + 6px);
+    }
+
+    /* ---------------------------------------------------------------
        View Toggle
        --------------------------------------------------------------- */
     .view-toggle {
@@ -1199,7 +1241,8 @@
         verified: 'All build specs verified -- every requirement has code and passing tests',
         presented: 'Presentation materials generated -- ready to demo',
       };
-      badge.title = phaseTips[phase] || '';
+      badge.classList.add('tip', 'tip--down');
+      badge.dataset.tip = phaseTips[phase] || '';
     }
 
     // --- Project Overview -----------------------------------------------
@@ -1334,7 +1377,7 @@
         const cards = columns[stage];
         html += `
           <div class="pipeline-column" data-stage="${stage}">
-            <div class="pipeline-column-header" title="${stageTooltips[stage] || ''}">
+            <div class="pipeline-column-header tip" data-tip="${stageTooltips[stage] || ''}">
               <span>${capitalize(stage)}</span>
               <span class="count">${cards.length}</span>
             </div>
@@ -1387,7 +1430,7 @@
         }).join('');
 
         html += `
-          <div class="build-spec-row">
+          <div class="build-spec-row" style="cursor: pointer;" onclick="showBsDetail('${bs.id}')">
             <span class="build-spec-id">${esc(bs.id)}</span>
             <div class="build-spec-info">
               <div class="build-spec-title">${esc(bs.title)}</div>
@@ -1396,7 +1439,7 @@
             <div class="stage-progress" title="Build cycle stage: ${bs.status}">
               ${segmentsHtml}
             </div>
-            <span class="status-badge" data-status="${bs.status}" title="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
+            <span class="status-badge tip" data-status="${bs.status}" data-tip="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
           </div>`;
       }
       html += '</div>';
@@ -1485,8 +1528,8 @@
                     <span class="trace-id">${esc(ac.id)}</span>
                     <span class="trace-title">${esc(ac.given ? `Given ${ac.given}` : '')}</span>
                     <div class="trace-leaf-labels">
-                      <span class="trace-leaf-label ${acBuildStatus.cls}" title="${acBuildStatus.tip}">${esc(acBuildStatus.text)}</span>
-                      <span class="trace-leaf-label ${acTestStatus.cls}" title="${acTestStatus.tip}">${esc(acTestStatus.text)}</span>
+                      <span class="trace-leaf-label tip ${acBuildStatus.cls}" data-tip="${acBuildStatus.tip}">${esc(acBuildStatus.text)}</span>
+                      <span class="trace-leaf-label tip ${acTestStatus.cls}" data-tip="${acTestStatus.tip}">${esc(acTestStatus.text)}</span>
                     </div>
                   </div>`;
           }
@@ -1519,18 +1562,25 @@
         return;
       }
 
-      // Meaningful metrics that create talking points
+      // --- 1. Requirements Depth (the honest one) ---
+      // How thoroughly specified are our requirements?
+      // Production-grade requirements typically have 6-8 ACs each.
+      // A demo with 3 ACs/req is a sketch, not a spec. Show that.
+      const totalReqs = prd.requirements.length;
+      const totalAc = prd.requirements.reduce((sum, r) =>
+        sum + (r.stories || []).reduce((s2, st) => s2 + (st.acceptanceCriteria?.length || 0), 0)
+      , 0);
+      const TARGET_AC_PER_REQ = 7;
+      const targetTotalAc = totalReqs * TARGET_AC_PER_REQ;
+      const depthPct = targetTotalAc > 0 ? Math.min(100, Math.round((totalAc / targetTotalAc) * 100)) : 0;
+      const avgAcPerReq = totalReqs > 0 ? (totalAc / totalReqs).toFixed(1) : 0;
 
-      // 1. Build Progress: verified build specs / total build specs
+      // --- 2. Build Completion ---
       const totalBs = (buildSpecs || []).length;
       const verifiedBs = (buildSpecs || []).filter(bs => bs.status === 'verified').length;
       const buildPct = totalBs > 0 ? Math.round((verifiedBs / totalBs) * 100) : 0;
 
-      // 2. Test Coverage: ACs with at least one passing test / total ACs
-      const totalAc = prd.requirements.reduce((sum, r) =>
-        sum + (r.stories || []).reduce((s2, st) => s2 + (st.acceptanceCriteria?.length || 0), 0)
-      , 0);
-
+      // --- 3. Test Coverage ---
       const testedAcIds = new Set();
       for (const ts of (testSpecs || [])) {
         for (const tc of (ts.testCases || [])) {
@@ -1539,8 +1589,8 @@
       }
       const testPct = totalAc > 0 ? Math.round((testedAcIds.size / totalAc) * 100) : 0;
 
-      // 3. Full Traceability: reqs where EVERY AC has code complete + passing test
-      const totalReqs = prd.requirements.length;
+      // --- 4. Chain Integrity ---
+      // Reqs where EVERY AC has code + passing test. The gold standard.
       let fullyTracedReqs = 0;
       for (const req of prd.requirements) {
         let allAcCovered = true;
@@ -1554,27 +1604,45 @@
         }
         if (allAcCovered) fullyTracedReqs++;
       }
-      const tracePct = totalReqs > 0 ? Math.round((fullyTracedReqs / totalReqs) * 100) : 0;
+      const chainPct = totalReqs > 0 ? Math.round((fullyTracedReqs / totalReqs) * 100) : 0;
 
-      // Overall: weighted average biased toward traceability (the hard one)
-      const overallPct = Math.round((buildPct * 0.3 + testPct * 0.3 + tracePct * 0.4));
+      // --- Overall Confidence ---
+      // Requirements depth anchors everything. If the spec is thin,
+      // high build/test numbers just mean you built a thin spec well.
+      const overallPct = Math.round(depthPct * 0.35 + buildPct * 0.15 + testPct * 0.20 + chainPct * 0.30);
 
       const circumference = 2 * Math.PI * 48;
 
-      // Context-aware notes
+      // --- Context-aware notes that surface the gaps ---
       const notes = [];
-      if (buildPct < 100) {
-        notes.push(`${totalBs - verifiedBs} build spec${totalBs - verifiedBs > 1 ? 's' : ''} still in progress.`);
+
+      // Requirements depth note -- this should almost always fire
+      if (depthPct < 80) {
+        notes.push(`<strong>Requirements are lightly specified.</strong> ${totalAc} acceptance criteria across ${totalReqs} requirements (${avgAcPerReq} per req). A production spec would need ~${TARGET_AC_PER_REQ} per requirement to cover edge cases, error handling, and non-functional needs. This is the biggest gap -- and the methodology is surfacing it.`);
       }
+
+      if (buildPct < 100) {
+        notes.push(`${totalBs - verifiedBs} of ${totalBs} build specs still in progress.`);
+      }
+
       if (testPct < 100 && testPct > 0) {
         const untested = totalAc - testedAcIds.size;
-        notes.push(`${untested} acceptance criteria without passing tests -- visual and integration criteria are verified during <code>/review</code>.`);
+        notes.push(`${untested} acceptance criteria lack passing automated tests. Visual criteria are verified during <code>/review</code>.`);
+      } else if (testPct === 0 && totalAc > 0) {
+        notes.push(`No acceptance criteria have passing automated tests yet. Run <code>/build</code> to generate and execute tests.`);
       }
-      if (tracePct < 100 && totalBs > 0) {
-        notes.push(`Full traceability requires every criterion to have both code and a passing test. ${totalReqs - fullyTracedReqs} requirement${totalReqs - fullyTracedReqs > 1 ? 's' : ''} still have gaps in the chain.`);
+
+      if (chainPct < 100 && totalBs > 0) {
+        notes.push(`${totalReqs - fullyTracedReqs} of ${totalReqs} requirements have incomplete traceability chains. Full chain = every AC has both verified code and a passing test.`);
       }
+
+      // The positive framing -- gaps are features, not bugs
+      if (depthPct < 80 || chainPct < 100) {
+        notes.push(`<em>These gaps are not failures -- they are exactly what the methodology is designed to reveal. A 4-hour workshop builds a working demo, not a production spec. RCF shows you what "done" actually looks like and how far you are from it.</em>`);
+      }
+
       if (overallPct === 100) {
-        notes.push('Every requirement is fully traced from definition to verified test. The chain is complete.');
+        notes.push('Full confidence: every requirement is deeply specified, fully built, tested, and traceable.');
       }
 
       const noteHtml = notes.length > 0
@@ -1583,9 +1651,9 @@
 
       container.innerHTML = `
         <div class="coverage-grid">
-          ${renderGauge(buildPct, `Build Progress (${verifiedBs}/${totalBs})`, circumference)}
+          ${renderGauge(depthPct, `Req. Depth (${avgAcPerReq} / ${TARGET_AC_PER_REQ} AC/req)`, circumference)}
+          ${renderGauge(buildPct, `Build Completion (${verifiedBs}/${totalBs})`, circumference)}
           ${renderGauge(testPct, `Test Coverage (${testedAcIds.size}/${totalAc} AC)`, circumference)}
-          ${renderGauge(tracePct, `Full Traceability (${fullyTracedReqs}/${totalReqs} reqs)`, circumference)}
           <div class="overall-coverage">
             <div class="overall-percent">${overallPct}%</div>
             <div class="overall-label">Overall Confidence</div>
@@ -1915,8 +1983,8 @@
                 <span class="detail-ac-id">${esc(ac.id)}</span>
                 <span class="detail-ac-text">${esc(acText)}</span>
                 <div class="detail-ac-badges">
-                  <span class="trace-leaf-label ${buildStatus.cls}" title="${buildStatus.tip}">${esc(buildStatus.text)}</span>
-                  <span class="trace-leaf-label ${testStatus.cls}" title="${testStatus.tip}">${esc(testStatus.text)}</span>
+                  <span class="trace-leaf-label tip ${buildStatus.cls}" data-tip="${buildStatus.tip}">${esc(buildStatus.text)}</span>
+                  <span class="trace-leaf-label tip ${testStatus.cls}" data-tip="${testStatus.tip}">${esc(testStatus.text)}</span>
                 </div>
               </li>`;
             }
@@ -1935,7 +2003,87 @@
           html += `<div class="detail-bs-row">
             <span class="detail-bs-id">${esc(bs.id)}</span>
             <span class="detail-bs-title">${esc(bs.title)}</span>
-            <span class="status-badge" data-status="${bs.status}" title="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
+            <span class="status-badge tip" data-status="${bs.status}" data-tip="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
+          </div>`;
+        }
+        html += '</div>';
+      }
+
+      document.getElementById('detailPanel').innerHTML = html;
+      document.getElementById('detailOverlay').classList.add('open');
+    };
+
+    window.showBsDetail = function(bsId) {
+      if (!projectData) return;
+
+      const bs = (projectData.buildSpecs || []).find(b => b.id === bsId);
+      if (!bs) return;
+
+      const { testSpecs, prd } = projectData;
+
+      // Find linked test spec
+      const linkedTs = (testSpecs || []).find(ts => ts.buildSpec === bsId);
+
+      // Find linked requirements
+      const bsReqs = Array.isArray(bs.requirement) ? bs.requirement : [bs.requirement];
+      const linkedReqs = bsReqs.map(rid => (prd?.requirements || []).find(r => r.id === rid)).filter(Boolean);
+
+      let html = `
+        <button class="detail-close" onclick="closeDetail()">&times;</button>
+        <div class="detail-header">
+          <div class="detail-req-id">${esc(bsId)}</div>
+          <div class="detail-req-title">${esc(bs.title)}</div>
+          <div style="margin-top: var(--space-sm);">
+            <span class="status-badge tip" data-status="${bs.status}" data-tip="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
+          </div>
+        </div>`;
+
+      // Linked requirements
+      if (linkedReqs.length > 0) {
+        html += '<div class="detail-section">';
+        html += '<div class="detail-section-title">Traces to Requirements</div>';
+        for (const req of linkedReqs) {
+          html += `<div class="detail-bs-row" style="cursor: pointer;" onclick="closeDetail(); setTimeout(() => showReqDetail(\'${req.id}\'), 100);">
+            <span class="detail-bs-id">${esc(req.id)}</span>
+            <span class="detail-bs-title">${esc(req.title)}</span>
+          </div>`;
+        }
+        html += '</div>';
+      }
+
+      // Acceptance criteria this spec covers
+      if (bs.acceptanceCriteria && bs.acceptanceCriteria.length > 0) {
+        html += '<div class="detail-section">';
+        html += '<div class="detail-section-title">Acceptance Criteria Covered</div>';
+        html += '<ul class="detail-ac-list">';
+        for (const acId of bs.acceptanceCriteria) {
+          const buildStatus = getAcBuildStatus(acId, projectData.buildSpecs);
+          const testStatus = getAcTestStatus(acId, testSpecs);
+          html += `<li class="detail-ac-item">
+            <span class="detail-ac-id">${esc(acId)}</span>
+            <div class="detail-ac-badges">
+              <span class="trace-leaf-label tip ${buildStatus.cls}" data-tip="${buildStatus.tip}">${esc(buildStatus.text)}</span>
+              <span class="trace-leaf-label tip ${testStatus.cls}" data-tip="${testStatus.tip}">${esc(testStatus.text)}</span>
+            </div>
+          </li>`;
+        }
+        html += '</ul></div>';
+      }
+
+      // Test results
+      if (linkedTs) {
+        const passing = (linkedTs.testCases || []).filter(tc => tc.status === 'passing').length;
+        const failing = (linkedTs.testCases || []).filter(tc => tc.status === 'failing').length;
+        const total = (linkedTs.testCases || []).length;
+
+        html += '<div class="detail-section">';
+        html += `<div class="detail-section-title">Tests (${esc(linkedTs.id)}) -- ${passing}/${total} passing</div>`;
+        for (const tc of (linkedTs.testCases || [])) {
+          const statusCls = tc.status === 'passing' ? 'verified' : (tc.status === 'failing' ? 'failing' : 'progress');
+          html += `<div class="detail-bs-row">
+            <span class="detail-bs-id">${esc(tc.id)}</span>
+            <span class="detail-bs-title">${esc(tc.description)}</span>
+            <span class="trace-leaf-label ${statusCls}">${esc(tc.status)}</span>
           </div>`;
         }
         html += '</div>';
