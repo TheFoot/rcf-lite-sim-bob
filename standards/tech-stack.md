@@ -58,6 +58,15 @@ The canonical technology choices for every RCF Lite project. Do not introduce al
 - `PORT` defaults to `3000` if not set.
 - `NODE_ENV` is either `development` or `production`. Default to `development`.
 
+## Pre-approved utility packages
+
+These are included in `package.json` and available for use when the PRD requires them:
+
+- **pdfkit** -- PDF document creation. Use for generating reports, invoices, or any PDF output. Import: `import PDFDocument from 'pdfkit'`.
+- **docx** -- DOCX document creation. Use for generating Word documents. Import: `import { Document, Paragraph, TextRun } from 'docx'`.
+
+If additional packages are needed, install via `npm install <package>` and document the justification.
+
 ## What NOT to use
 
 - No TypeScript (adds a build step).

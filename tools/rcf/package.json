@@ -1,0 +1,12 @@
+{
+  "name": "@rcf-lite/cli",
+  "version": "0.1.0",
+  "description": "RCF Lite CLI -- structured AI development toolkit",
+  "type": "module",
+  "bin": {
+    "rcf": "./bin/rcf.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

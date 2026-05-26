@@ -6,11 +6,15 @@
   "scripts": {
     "dev": "nodemon src/server/index.mjs",
     "start": "node src/server/index.mjs",
-    "test": "node --test src/tests/"
+    "test": "node --test src/tests/",
+    "rcf": "node tools/rcf/bin/rcf.mjs",
+    "dashboard": "node tools/dashboard/server.mjs"
   },
   "dependencies": {
     "express": "^4.21.0",
-    "helmet": "^8.0.0"
+    "helmet": "^8.0.0",
+    "pdfkit": "^0.15.0",
+    "docx": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
