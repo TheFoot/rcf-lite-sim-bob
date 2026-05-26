@@ -1507,50 +1507,78 @@
         return;
       }
 
-      // Calculate coverage metrics
-      const totalReqs = prd.requirements.length;
-      const totalStories = prd.requirements.reduce((sum, r) => sum + (r.stories?.length || 0), 0);
+      // Meaningful metrics that create talking points
+
+      // 1. Build Progress: verified build specs / total build specs
+      const totalBs = (buildSpecs || []).length;
+      const verifiedBs = (buildSpecs || []).filter(bs => bs.status === 'verified').length;
+      const buildPct = totalBs > 0 ? Math.round((verifiedBs / totalBs) * 100) : 0;
+
+      // 2. Test Coverage: ACs with at least one passing test / total ACs
       const totalAc = prd.requirements.reduce((sum, r) =>
         sum + (r.stories || []).reduce((s2, st) => s2 + (st.acceptanceCriteria?.length || 0), 0)
       , 0);
 
-      // Stories with at least one AC
-      const storiesWithAc = prd.requirements.reduce((sum, r) =>
-        sum + (r.stories || []).filter(s => s.acceptanceCriteria?.length > 0).length
-      , 0);
-
-      // Reqs with at least one story
-      const reqsWithStories = prd.requirements.filter(r => r.stories?.length > 0).length;
-
-      // AC with at least one test case covering them
       const testedAcIds = new Set();
       for (const ts of (testSpecs || [])) {
         for (const tc of (ts.testCases || [])) {
-          if (tc.verifiesAc) testedAcIds.add(tc.verifiesAc);
+          if (tc.verifiesAc && tc.status === 'passing') testedAcIds.add(tc.verifiesAc);
         }
       }
+      const testPct = totalAc > 0 ? Math.round((testedAcIds.size / totalAc) * 100) : 0;
 
-      const reqStoryPct = totalReqs > 0 ? Math.round((reqsWithStories / totalReqs) * 100) : 0;
-      const storyAcPct = totalStories > 0 ? Math.round((storiesWithAc / totalStories) * 100) : 0;
-      const acTestPct = totalAc > 0 ? Math.round((testedAcIds.size / totalAc) * 100) : 0;
-      const overallPct = Math.round((reqStoryPct + storyAcPct + acTestPct) / 3);
+      // 3. Full Traceability: reqs where EVERY AC has code complete + passing test
+      const totalReqs = prd.requirements.length;
+      let fullyTracedReqs = 0;
+      for (const req of prd.requirements) {
+        let allAcCovered = true;
+        for (const story of (req.stories || [])) {
+          for (const ac of (story.acceptanceCriteria || [])) {
+            const hasBuild = getAcBuildStatus(ac.id, buildSpecs).cls === 'verified';
+            const hasTest = testedAcIds.has(ac.id);
+            if (!hasBuild || !hasTest) { allAcCovered = false; break; }
+          }
+          if (!allAcCovered) break;
+        }
+        if (allAcCovered) fullyTracedReqs++;
+      }
+      const tracePct = totalReqs > 0 ? Math.round((fullyTracedReqs / totalReqs) * 100) : 0;
 
-      const circumference = 2 * Math.PI * 48; // radius = 48
+      // Overall: weighted average biased toward traceability (the hard one)
+      const overallPct = Math.round((buildPct * 0.3 + testPct * 0.3 + tracePct * 0.4));
 
-      const coverageNote = acTestPct < 100
-        ? '<p style="color: var(--color-text-muted); font-size: var(--font-size-sm); margin-top: var(--space-lg); text-align: center;">RCF Lite uses advisory coverage gauges. Visual and integration criteria are verified during the <code style="color: var(--color-accent);">/review</code> phase rather than automated tests. Full RCF enforces hard coverage gates.</p>'
+      const circumference = 2 * Math.PI * 48;
+
+      // Context-aware notes
+      const notes = [];
+      if (buildPct < 100) {
+        notes.push(`${totalBs - verifiedBs} build spec${totalBs - verifiedBs > 1 ? 's' : ''} still in progress.`);
+      }
+      if (testPct < 100 && testPct > 0) {
+        const untested = totalAc - testedAcIds.size;
+        notes.push(`${untested} acceptance criteria without passing tests -- visual and integration criteria are verified during <code>/review</code>.`);
+      }
+      if (tracePct < 100 && totalBs > 0) {
+        notes.push(`Full traceability requires every criterion to have both code and a passing test. ${totalReqs - fullyTracedReqs} requirement${totalReqs - fullyTracedReqs > 1 ? 's' : ''} still have gaps in the chain.`);
+      }
+      if (overallPct === 100) {
+        notes.push('Every requirement is fully traced from definition to verified test. The chain is complete.');
+      }
+
+      const noteHtml = notes.length > 0
+        ? `<div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.6;">${notes.map(n => `<p style="margin: var(--space-xs) 0;">${n}</p>`).join('')}</div>`
         : '';
 
       container.innerHTML = `
         <div class="coverage-grid">
-          ${renderGauge(reqStoryPct, 'Reqs with Stories', circumference)}
-          ${renderGauge(storyAcPct, 'Stories with AC', circumference)}
-          ${renderGauge(acTestPct, 'AC with Tests', circumference)}
+          ${renderGauge(buildPct, `Build Progress (${verifiedBs}/${totalBs})`, circumference)}
+          ${renderGauge(testPct, `Test Coverage (${testedAcIds.size}/${totalAc} AC)`, circumference)}
+          ${renderGauge(tracePct, `Full Traceability (${fullyTracedReqs}/${totalReqs} reqs)`, circumference)}
           <div class="overall-coverage">
             <div class="overall-percent">${overallPct}%</div>
-            <div class="overall-label">Overall Coverage</div>
+            <div class="overall-label">Overall Confidence</div>
           </div>
-        </div>${coverageNote}`;
+        </div>${noteHtml}`;
     }
 
     function renderGauge(pct, label, circumference) {
