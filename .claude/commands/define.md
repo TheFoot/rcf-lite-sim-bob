@@ -26,9 +26,31 @@ Guide the user through defining their product idea and generating a structured P
 
 6. **Guide forward.** Tell the user: "Requirements are locked. Run `/design` to generate the technical design and build specs."
 
+## Workshop mode -- individual component builds
+
+If the user mentions they're building one component of a larger team product, help them scope appropriately:
+
+- Their component should be fully self-contained -- no dependencies on other team members' work
+- Use mock/generated data instead of requiring live APIs or databases
+- Include a `data/` directory with JSON seed files for realistic demo data
+- The component should have BOTH something visual (a page or UI) AND something technical (an API endpoint or data processing)
+- It should be demonstrable in 2 minutes during a presentation
+- Generate realistic mock data during the build -- names, dates, status values that look real
+
+Help the user narrow their component to 2-3 requirements max. Suggest: "For a workshop component, aim for one core feature that works end-to-end, plus one supporting feature. That gives you a complete demo without overcommitting."
+
+If the user seems stuck on what to build, suggest concrete options based on their role:
+- **Product/UX:** Template designer, review workflow board, form builder
+- **Backend dev:** Document generator (PDF/DOCX), search service, data import tool, export gateway
+- **Data:** Analytics dashboard, data pipeline, report generator
+- **Compliance/governance:** Policy checker, audit trail, compliance dashboard
+- **Platform/infra:** Notification service, event bus, monitoring dashboard
+- **QA/CI:** Test result dashboard, quality metrics, automated checker
+
 ## Scope guardian reminders
 
-- 3-5 requirements maximum for a workshop/demo scope
+- 3-5 requirements maximum for a workshop/demo scope (2-3 for individual components)
 - Each requirement should be implementable in under 30 minutes
 - Depth over breadth -- one fully-traced feature beats five half-built ones
 - "We can always add more in a future iteration" is a valid and professional response
+- Mock data is your friend -- generate it, don't try to connect to real services
