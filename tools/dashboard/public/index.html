@@ -1575,81 +1575,68 @@
         return;
       }
 
-      // --- 1. Requirements Depth (the honest one) ---
-      // How thoroughly specified are our requirements?
-      // Production-grade requirements typically have 6-8 ACs each.
-      // A demo with 3 ACs/req is a sketch, not a spec. Show that.
       const totalReqs = prd.requirements.length;
       const totalAc = prd.requirements.reduce((sum, r) =>
         sum + (r.stories || []).reduce((s2, st) => s2 + (st.acceptanceCriteria?.length || 0), 0)
       , 0);
+
+      // --- 1. Requirements Coverage ---
+      // A production app needs more than functional requirements.
+      // Estimate: functional reqs are typically ~30% of a full spec.
+      // The rest: security, compliance, non-functional (perf, a11y,
+      // resilience), operational (deploy, CI/CD, monitoring, logging),
+      // data (backup, migration), integration.
+      const PRODUCTION_MULTIPLIER = 3.5;
+      const estProdReqs = Math.round(totalReqs * PRODUCTION_MULTIPLIER);
+      const reqCovPct = estProdReqs > 0 ? Math.min(100, Math.round((totalReqs / estProdReqs) * 100)) : 0;
+
+      // --- 2. Requirements Depth ---
+      // For the reqs we have, how thoroughly specified?
       const TARGET_AC_PER_REQ = 7;
-      const targetTotalAc = totalReqs * TARGET_AC_PER_REQ;
-      const depthPct = targetTotalAc > 0 ? Math.min(100, Math.round((totalAc / targetTotalAc) * 100)) : 0;
+      const depthPct = totalReqs > 0 ? Math.min(100, Math.round((totalAc / (totalReqs * TARGET_AC_PER_REQ)) * 100)) : 0;
       const avgAcPerReq = totalReqs > 0 ? (totalAc / totalReqs).toFixed(1) : 0;
 
-      // --- 2. Build Completion ---
-      const totalBs = (buildSpecs || []).length;
-      const verifiedBs = (buildSpecs || []).filter(bs => bs.status === 'verified').length;
-      const buildPct = totalBs > 0 ? Math.round((verifiedBs / totalBs) * 100) : 0;
-
-      // --- 3. Test Coverage ---
-      const testedAcIds = new Set();
+      // --- 3. Test Depth ---
+      // Tests per AC vs production target. One test per AC is a smoke
+      // test, not coverage. Production needs happy path + edge cases +
+      // error handling + integration per AC.
+      let totalPassingTests = 0;
       for (const ts of (testSpecs || [])) {
-        for (const tc of (ts.testCases || [])) {
-          if (tc.verifiesAc && tc.status === 'passing') testedAcIds.add(tc.verifiesAc);
-        }
+        totalPassingTests += (ts.testCases || []).filter(tc => tc.status === 'passing').length;
       }
-      const testPct = totalAc > 0 ? Math.round((testedAcIds.size / totalAc) * 100) : 0;
-
-      // --- 4. Chain Integrity ---
-      // Reqs where EVERY AC has code + passing test. The gold standard.
-      let fullyTracedReqs = 0;
-      for (const req of prd.requirements) {
-        let allAcCovered = true;
-        for (const story of (req.stories || [])) {
-          for (const ac of (story.acceptanceCriteria || [])) {
-            const hasBuild = getAcBuildStatus(ac.id, buildSpecs).cls === 'verified';
-            const hasTest = testedAcIds.has(ac.id);
-            if (!hasBuild || !hasTest) { allAcCovered = false; break; }
-          }
-          if (!allAcCovered) break;
-        }
-        if (allAcCovered) fullyTracedReqs++;
-      }
-      const chainPct = totalReqs > 0 ? Math.round((fullyTracedReqs / totalReqs) * 100) : 0;
+      const TARGET_TESTS_PER_AC = 5;
+      const targetTests = totalAc * TARGET_TESTS_PER_AC;
+      const testDepthPct = targetTests > 0 ? Math.min(100, Math.round((totalPassingTests / targetTests) * 100)) : 0;
+      const avgTestsPerAc = totalAc > 0 ? (totalPassingTests / totalAc).toFixed(1) : 0;
 
       // --- Production Readiness ---
-      // Capped by requirements depth. You can't be more production-ready
-      // than your spec is deep. Building a thin spec perfectly is still thin.
-      const overallPct = Math.min(depthPct, Math.round(depthPct * 0.4 + buildPct * 0.15 + testPct * 0.15 + chainPct * 0.30));
+      // Weighted toward the weakest dimension. You're only as
+      // production-ready as your biggest gap.
+      const scores = [reqCovPct, depthPct, testDepthPct];
+      const minScore = Math.min(...scores);
+      const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+      const overallPct = Math.round(minScore * 0.5 + avgScore * 0.5);
 
       const circumference = 2 * Math.PI * 48;
 
-      // --- Context notes: state facts, not methodology pitch ---
+      // --- Context notes ---
       const notes = [];
 
+      const missingAreas = ['security (authentication, data protection)', 'compliance (audit trails, data retention)', 'non-functional (performance, accessibility, resilience)', 'operational (deployment, CI/CD, monitoring, logging)'];
+      if (reqCovPct < 80) {
+        notes.push(`<strong>${totalReqs} functional requirements defined.</strong> A production-ready app would also need requirements for ${missingAreas.join('; ')}. Estimated ~${estProdReqs} total requirements for production.`);
+      }
+
       if (depthPct < 80) {
-        notes.push(`<strong>Requirements are lightly specified.</strong> ${totalAc} acceptance criteria across ${totalReqs} requirements (${avgAcPerReq} per req). A production-ready spec would typically need ~${TARGET_AC_PER_REQ} per requirement to cover edge cases, error handling, and non-functional concerns. This is the largest gap.`);
+        notes.push(`<strong>Requirements are lightly specified</strong> at ${avgAcPerReq} acceptance criteria per requirement. Production depth is typically ~${TARGET_AC_PER_REQ} per requirement, covering edge cases, error handling, and boundary conditions.`);
       }
 
-      if (buildPct < 100) {
-        notes.push(`${totalBs - verifiedBs} of ${totalBs} build specs still in progress.`);
-      }
-
-      if (testPct < 100 && testPct > 0) {
-        const untested = totalAc - testedAcIds.size;
-        notes.push(`${untested} acceptance criteria lack passing automated tests.`);
-      } else if (testPct === 0 && totalAc > 0) {
-        notes.push(`No acceptance criteria have passing automated tests yet.`);
-      }
-
-      if (chainPct < 100 && totalBs > 0) {
-        notes.push(`${totalReqs - fullyTracedReqs} of ${totalReqs} requirements have incomplete traceability chains (every AC needs both verified code and a passing test).`);
+      if (testDepthPct < 80) {
+        notes.push(`<strong>Test coverage is thin</strong> at ${avgTestsPerAc} tests per acceptance criterion. Production suites need ~${TARGET_TESTS_PER_AC} per AC: happy path, edge cases, error handling, and integration tests.`);
       }
 
       if (overallPct < 50) {
-        notes.push(`This project is a working prototype, not a production-ready product. The gaps above show what a production build would need to address: deeper specifications, broader acceptance criteria, non-functional requirements, and comprehensive test coverage.`);
+        notes.push(`This is a working prototype. The gaps above represent the distance to a production-ready product -- deeper specifications, broader requirement coverage, and comprehensive test suites.`);
       }
 
       const noteHtml = notes.length > 0
@@ -1658,9 +1645,9 @@
 
       container.innerHTML = `
         <div class="coverage-grid">
+          ${renderGauge(reqCovPct, `Req. Coverage (${totalReqs} / ~${estProdReqs} areas)`, circumference)}
           ${renderGauge(depthPct, `Req. Depth (${avgAcPerReq} / ${TARGET_AC_PER_REQ} AC/req)`, circumference)}
-          ${renderGauge(buildPct, `Build Completion (${verifiedBs}/${totalBs})`, circumference)}
-          ${renderGauge(testPct, `Test Coverage (${testedAcIds.size}/${totalAc} AC)`, circumference)}
+          ${renderGauge(testDepthPct, `Test Depth (${avgTestsPerAc} / ${TARGET_TESTS_PER_AC} tests/AC)`, circumference)}
           <div class="overall-coverage">
             <div class="overall-percent">${overallPct}%</div>
             <div class="overall-label">Production Readiness</div>
