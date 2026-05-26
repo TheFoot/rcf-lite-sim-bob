@@ -1186,8 +1186,20 @@
       document.title = `${project.name || 'Project'} -- RCF Dashboard`;
 
       const badge = document.getElementById('phaseBadge');
-      badge.dataset.phase = project.phase || 'new';
-      badge.textContent = project.phase || 'new';
+      const phase = project.phase || 'new';
+      badge.dataset.phase = phase;
+      badge.textContent = phase;
+
+      const phaseTips = {
+        new: 'Project created, no requirements defined yet',
+        defined: 'Requirements captured -- run /design to generate the technical design',
+        designed: 'Technical design and build specs ready -- run /build to start coding',
+        building: 'Build cycle in progress -- one or more specs being implemented',
+        testing: 'Tests running against the built code',
+        verified: 'All build specs verified -- every requirement has code and passing tests',
+        presented: 'Presentation materials generated -- ready to demo',
+      };
+      badge.title = phaseTips[phase] || '';
     }
 
     // --- Project Overview -----------------------------------------------
@@ -1384,7 +1396,7 @@
             <div class="stage-progress" title="Build cycle stage: ${bs.status}">
               ${segmentsHtml}
             </div>
-            <span class="status-badge" data-status="${bs.status}">${esc(bs.status)}</span>
+            <span class="status-badge" data-status="${bs.status}" title="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
           </div>`;
       }
       html += '</div>';
@@ -1597,6 +1609,17 @@
           <span class="gauge-label">${label}</span>
         </div>`;
     }
+
+    // --- Build Spec Status Tooltips ------------------------------------
+
+    const bsStatusTips = {
+      ready: 'Build spec defined, waiting to start the 5-stage cycle',
+      defining: 'Stage 1 of 5 -- test cases are being written from the acceptance criteria',
+      building: 'Stage 2 of 5 -- code is being implemented against the spec',
+      reviewing: 'Stage 3 of 5 -- code is being reviewed against standards and acceptance criteria',
+      testing: 'Stage 4 of 5 -- automated tests are running against the code',
+      verified: 'Stage 5 complete -- all tests passing, code reviewed, traceability chain linked',
+    };
 
     // --- Timestamp -----------------------------------------------------
 
@@ -1912,7 +1935,7 @@
           html += `<div class="detail-bs-row">
             <span class="detail-bs-id">${esc(bs.id)}</span>
             <span class="detail-bs-title">${esc(bs.title)}</span>
-            <span class="status-badge" data-status="${bs.status}">${esc(bs.status)}</span>
+            <span class="status-badge" data-status="${bs.status}" title="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
           </div>`;
         }
         html += '</div>';

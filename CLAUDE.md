@@ -69,7 +69,12 @@ Each build spec executes through 5 stages. This is serial -- one build spec at a
 
 ### Stage 1: DEFINE
 
-Read the build spec (BS-NNN.json). Generate test specs from the acceptance criteria. Write 1-2 tests per acceptance criterion -- enough to prove the requirement is met, not comprehensive coverage. Save to `rcf/tests/TS-NNN.json` and create the actual test files in `src/tests/`.
+Read the build spec (BS-NNN.json). Generate test specs from the acceptance criteria:
+
+- Write 2-4 tests per acceptance criterion: at minimum a happy-path test, an edge case, and an error/validation case.
+- For visual/UI criteria (e.g., "dashboard shows summary", "navigation link exists"), write a DOM-level integration test that starts the server, fetches the HTML, and asserts the expected elements exist. These are lightweight but they count in the coverage gauge.
+- Save to `rcf/tests/TS-NNN.json` and create the actual test files in `src/tests/`.
+- Every test case in the JSON must have a `verifiesAc` field linking it to the AC it covers. The dashboard coverage gauge reads this field -- missing it means the test is invisible to traceability.
 
 ### Stage 2: BUILD
 
@@ -90,7 +95,14 @@ Run the tests from Stage 1. Fix any failures. Keep iterations minimal -- if a te
 
 ### Stage 5: FINALISE
 
-Update the build spec status to `verified` in `rcf/build-specs/BS-NNN.json`. Update `rcf/trace.json` with the completed chain. Commit all changes with a message referencing the build spec ID: `feat(BS-001): <description>`.
+Update ALL project metadata to reflect reality. This is critical -- the dashboard reads these fields:
+
+- `rcf/build-specs/BS-NNN.json`: set `status` to `"verified"`
+- `rcf/tests/TS-NNN.json`: set top-level `status` to `"passed"`, and set every `testCases[].status` to `"passing"` or `"failing"` based on actual results. Do NOT leave them as `"pending"` -- this breaks the coverage gauges.
+- `rcf/project.json`: update `stats.buildSpecsVerified`, `stats.testsPassing`, `stats.testsTotal`
+- `rcf/trace.json`: regenerate the full traceability index
+
+Commit: `chore(BS-NNN): finalise -- N tests passing, traceability updated`
 
 Report to the user: what was built, what tests pass, what the traceability chain looks like.
 

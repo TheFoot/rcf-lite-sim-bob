@@ -59,9 +59,13 @@ Commit test fixes if any: `fix(BS-NNN): resolve test failures`
 ### Stage 5: FINALISE
 
 - Update build spec status to "verified" in `rcf/build-specs/BS-NNN.json`
-- Update `rcf/tests/TS-NNN.json` status to "passed"
+- Update `rcf/tests/TS-NNN.json`:
+  - Set top-level `status` to `"passed"`
+  - Set EVERY `testCases[].status` to `"passing"` for tests that passed, `"failing"` for tests that failed. This is critical -- the dashboard coverage gauges read these statuses. If you leave them as `"pending"`, the coverage section shows 0%.
+- Update `rcf/project.json`:
+  - Set `stats.buildSpecsVerified` to the correct count
+  - Set `stats.testsPassing` and `stats.testsTotal` to actual numbers
 - Regenerate `rcf/trace.json` (the full traceability index)
-- Update `rcf/project.json` with completion progress
 - Final commit: `chore(BS-NNN): finalise -- all tests passing`
 
 Report to the user:
