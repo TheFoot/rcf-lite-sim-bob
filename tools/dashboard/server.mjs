@@ -213,6 +213,14 @@ const server = createServer(async (req, res) => {
 // Start
 // ---------------------------------------------------------------------------
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Try: node tools/dashboard/server.mjs --port ${Number(PORT) + 1}`);
+    process.exit(1);
+  }
+  throw err;
+});
+
 server.listen(PORT, () => {
   console.log(`\n  RCF Lite Dashboard`);
   console.log(`  ------------------`);

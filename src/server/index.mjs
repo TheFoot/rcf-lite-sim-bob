@@ -63,17 +63,24 @@ app.get('*', (_req, res) => {
 // Start
 // ---------------------------------------------------------------------------
 
-export function startServer(port = PORT) {
-  return new Promise((resolve) => {
+export function startServer({ port = PORT } = {}) {
+  return new Promise((resolve, reject) => {
     const server = app.listen(port, () => {
       const addr = server.address();
       console.log(`Server running at http://localhost:${addr.port}`);
       resolve(server);
     });
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use. Try: PORT=${Number(port) + 1} npm run dev`);
+        process.exit(1);
+      }
+      reject(err);
+    });
   });
 }
 
-const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+const isMain = import.meta.url === `file://${process.argv[1]}`;
 if (isMain) {
   startServer();
 }
