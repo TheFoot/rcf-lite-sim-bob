@@ -105,11 +105,17 @@ Exit code 0 if valid, 1 if errors found.
 
     // Check build specs reference valid PRD entities
     for (const bs of buildSpecs) {
-      if (bs.requirement && !reqIds.has(bs.requirement)) {
-        refErrors.push(`${bs.id}: references unknown requirement "${bs.requirement}"`);
+      const bsReqs = Array.isArray(bs.requirement) ? bs.requirement : bs.requirement ? [bs.requirement] : [];
+      for (const r of bsReqs) {
+        if (!reqIds.has(r)) {
+          refErrors.push(`${bs.id}: references unknown requirement "${r}"`);
+        }
       }
-      if (bs.story && !storyIds.has(bs.story)) {
-        refErrors.push(`${bs.id}: references unknown story "${bs.story}"`);
+      const bsStories = Array.isArray(bs.story) ? bs.story : bs.story ? [bs.story] : [];
+      for (const s of bsStories) {
+        if (!storyIds.has(s)) {
+          refErrors.push(`${bs.id}: references unknown story "${s}"`);
+        }
       }
       for (const acId of bs.acceptanceCriteria || []) {
         if (!acIds.has(acId)) {

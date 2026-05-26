@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server/index.mjs",
     "start": "node src/server/index.mjs",
-    "test": "node --test src/tests/",
+    "test": "node --test 'src/tests/**/*.test.mjs'",
     "rcf": "node tools/rcf/bin/rcf.mjs",
     "dashboard": "node tools/dashboard/server.mjs"
   },
