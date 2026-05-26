@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RCF Lite Build Spec",
+  "type": "object",
+  "required": ["id", "title", "requirement", "story", "acceptanceCriteria", "status"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^BS-\\d{3}$" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "requirement": { "type": "string", "pattern": "^REQ-\\d{3}$", "description": "Parent requirement ID" },
+    "story": { "type": "string", "pattern": "^US-\\d{3}$", "description": "Parent user story ID" },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^AC-\\d{3}-\\d{2}$" },
+      "description": "Acceptance criteria IDs this spec must satisfy"
+    },
+    "designContext": { "type": "string", "description": "Relevant design details for implementation" },
+    "standards": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Which standards docs apply (e.g., rest-api, spa-patterns)"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^BS-\\d{3}$" },
+      "description": "Build specs that must complete before this one"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ready", "defining", "building", "reviewing", "testing", "verified"],
+      "description": "Current stage in the 5-stage build cycle"
+    },
+    "order": { "type": "integer", "minimum": 1, "description": "Build order (1 = first)" },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

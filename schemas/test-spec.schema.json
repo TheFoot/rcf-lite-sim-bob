@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RCF Lite Test Spec",
+  "type": "object",
+  "required": ["id", "buildSpec", "acceptanceCriteria", "testCases", "status"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^TS-\\d{3}$" },
+    "buildSpec": { "type": "string", "pattern": "^BS-\\d{3}$", "description": "Parent build spec ID" },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^AC-\\d{3}-\\d{2}$" },
+      "description": "Acceptance criteria these tests verify"
+    },
+    "testCases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "verifiesAc"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^TC-\\d{3}-\\d{2}$" },
+          "description": { "type": "string", "description": "What this test proves" },
+          "verifiesAc": { "type": "string", "pattern": "^AC-\\d{3}-\\d{2}$", "description": "Which AC this test verifies" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "passing", "failing"],
+            "description": "Test execution status"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "testFile": { "type": "string", "description": "Path to the executable test file" },
+    "status": {
+      "type": "string",
+      "enum": ["defined", "running", "passed", "failed"],
+      "description": "Overall test spec status"
+    },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+{
+  "name": "rcf-lite-project",
+  "version": "0.0.1",
+  "description": "Structured AI development with the Requirements Confidence Framework",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server/index.mjs",
+    "start": "node src/server/index.mjs",
+    "test": "node --test src/tests/"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "helmet": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RCF Lite Traceability Index",
+  "description": "Auto-generated traceability index. Regenerated after each build spec completes.",
+  "type": "object",
+  "required": ["generated", "chains"],
+  "properties": {
+    "generated": { "type": "string", "format": "date-time" },
+    "chains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "stories"],
+        "properties": {
+          "requirement": {
+            "type": "object",
+            "required": ["id", "title"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "stories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title", "acceptanceCriteria"],
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "acceptanceCriteria": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "buildSpec": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "status": { "type": "string" }
+                        }
+                      },
+                      "testSpec": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "status": { "type": "string" },
+                          "testCount": { "type": "integer" },
+                          "passingCount": { "type": "integer" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "totalRequirements": { "type": "integer" },
+        "totalAcceptanceCriteria": { "type": "integer" },
+        "coveredAcceptanceCriteria": { "type": "integer" },
+        "totalTests": { "type": "integer" },
+        "passingTests": { "type": "integer" },
+        "coveragePercent": { "type": "number" }
+      }
+    }
+  }
+}

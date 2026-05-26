@@ -1,0 +1,5 @@
+{
+  "watch": ["src/server/"],
+  "ext": "mjs,json",
+  "ignore": ["src/public/", "src/tests/", "rcf/", "node_modules/"]
+}

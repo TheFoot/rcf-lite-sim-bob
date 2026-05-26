@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RCF Lite Project",
+  "type": "object",
+  "required": ["name", "phase", "created"],
+  "properties": {
+    "name": { "type": "string", "description": "Project name" },
+    "description": { "type": "string", "description": "One-line project description" },
+    "phase": {
+      "type": "string",
+      "enum": ["new", "defined", "designed", "building", "testing", "verified", "presented"],
+      "description": "Current project phase"
+    },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "requirements": { "type": "integer", "minimum": 0 },
+        "stories": { "type": "integer", "minimum": 0 },
+        "acceptanceCriteria": { "type": "integer", "minimum": 0 },
+        "buildSpecs": { "type": "integer", "minimum": 0 },
+        "buildSpecsVerified": { "type": "integer", "minimum": 0 },
+        "testsPassing": { "type": "integer", "minimum": 0 },
+        "testsTotal": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "additionalProperties": false
+}

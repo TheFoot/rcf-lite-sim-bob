@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RCF Lite PRD",
+  "type": "object",
+  "required": ["name", "description", "requirements"],
+  "properties": {
+    "name": { "type": "string", "description": "Product/feature name" },
+    "description": { "type": "string", "description": "What this product does and who it's for" },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description", "stories"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^REQ-\\d{3}$" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "priority": { "type": "string", "enum": ["must", "should", "could"] },
+          "stories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title", "asA", "iWant", "soThat", "acceptanceCriteria"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^US-\\d{3}$" },
+                "title": { "type": "string" },
+                "asA": { "type": "string" },
+                "iWant": { "type": "string" },
+                "soThat": { "type": "string" },
+                "acceptanceCriteria": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "given", "when", "then"],
+                    "properties": {
+                      "id": { "type": "string", "pattern": "^AC-\\d{3}-\\d{2}$" },
+                      "given": { "type": "string" },
+                      "when": { "type": "string" },
+                      "then": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
