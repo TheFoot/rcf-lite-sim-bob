@@ -102,6 +102,35 @@ Two stylesheets, loaded in order:
 - BEM-lite: `.block`, `.block--modifier`, `.block__element`. Keep nesting to two levels maximum.
 - Prefix state classes with `is-` or `has-`: `.is-active`, `.has-error`.
 
+## Interactivity and CRUD
+
+Every entity in the app must support full CRUD through the UI. This is the minimum bar for a demo-quality build.
+
+### View structure per entity
+
+Each entity type needs three views:
+
+1. **List view** -- Displays all items. Each item is clickable (navigates to detail view). Include a "Create new" button.
+2. **Detail view** -- Shows all fields for one item. Includes "Edit" and "Delete" actions. Delete shows a confirmation before removing.
+3. **Form view** -- Used for both create and edit. Pre-populated for edit mode. Validates required fields. On submit, persists via the API and navigates back to the list or detail.
+
+### Interaction rules
+
+- Every list item is a clickable row or card. Use `<a data-link>` or a click handler that navigates to the detail route.
+- No read-only lists. If you can see items, you can interact with them.
+- After create/update/delete, the list refreshes automatically. No manual page reload.
+- Empty states: when a list has no items, show a clear message and a prominent "Create your first X" call-to-action.
+
+### Landing page
+
+The app's landing page (usually `/` or `/dashboard`) must open with:
+
+1. **Project context** -- the app name, a one-line description, and the current state (e.g., "3 tasks in progress, 2 completed").
+2. **Quick navigation** -- clear paths to each major feature/entity.
+3. **Live summary data** -- counts, statuses, or a simple chart. Not an empty shell.
+
+Generate realistic seed data so the landing page is populated on first run.
+
 ## Static assets
 
 All frontend files served from `src/public/`:

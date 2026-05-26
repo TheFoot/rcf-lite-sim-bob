@@ -98,6 +98,36 @@ This is a rapid-prototyping toolkit designed for workshops, hackathons, and quic
 
 Frame this as smart scoping, not restriction. Help the user make good prioritisation decisions.
 
+## UI quality -- non-negotiable
+
+Every build must produce a UI that is self-explanatory and fully interactive. "Don't make me think" is the standard. These rules apply to every frontend artefact you generate:
+
+### Every element must work
+
+- If something looks clickable, it MUST be clickable. No decorative buttons, no placeholder links, no badges or indicators that do nothing.
+- List items MUST be clickable. Clicking a list item opens a detail view (at minimum: all fields displayed, edit button, delete button).
+- Status badges, progress bars, and indicators MUST reflect real data. If there is no real data yet, use generated seed data -- not static decoration.
+
+### CRUD is the minimum bar
+
+Every entity in the app MUST support all four operations:
+- **Create:** A form or modal to add a new item. Validated inputs.
+- **Read:** List view with clickable items. Detail view for each item.
+- **Update:** Edit form pre-populated with current values. Save persists the change.
+- **Delete:** Confirmation prompt, then removal. The list updates immediately.
+
+If a build spec only mentions "display tasks", you still implement full CRUD. The spec defines the minimum -- interactive, working software is the real deliverable.
+
+### Context first, detail second
+
+- The landing page or dashboard MUST open with project-level context: what is this app, what does it do, what is the current state.
+- Never drop the user into a detail view (task board, data table) without a header or hero section that explains the project.
+- Navigation must be obvious. If there are multiple views, provide a clear nav bar or sidebar.
+
+### Seed data
+
+Generate realistic seed data for every entity on first run. An empty-state app with no data is a poor demo. Seed data should be plausible (real-sounding names, dates, descriptions) and demonstrate the app's capabilities (mix of statuses, priorities, assignments).
+
 ## Session management and agent harness
 
 ### Context budget

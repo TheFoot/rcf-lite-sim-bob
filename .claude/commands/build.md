@@ -37,6 +37,13 @@ Review the code you just wrote against:
 - Each acceptance criterion in the build spec -- is it satisfied?
 - Standards compliance -- does the code follow `standards/`?
 - Basic correctness -- any obvious bugs, security issues, or missing error handling?
+- **UI quality (mandatory for any frontend work):**
+  - Every list item is clickable and opens a detail/edit view
+  - Full CRUD operations work (create, read, update, delete) for every entity
+  - No decorative or non-functional UI elements -- every badge, button, and indicator works
+  - The main page opens with project context (what is this, what does it do)
+  - Seed data is present so the app looks alive on first run
+  - Navigation is obvious and functional
 
 If issues are found, fix them before proceeding. Commit fixes: `fix(BS-NNN): <what was fixed>`
 
