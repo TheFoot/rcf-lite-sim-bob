@@ -733,6 +733,104 @@
     }
 
     /* ---------------------------------------------------------------
+       View Toggle
+       --------------------------------------------------------------- */
+    .view-toggle {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .view-toggle:hover {
+      color: var(--color-text);
+    }
+
+    .view-toggle.active {
+      background: var(--color-accent);
+      color: var(--color-bg);
+    }
+
+    /* ---------------------------------------------------------------
+       Flow Graph
+       --------------------------------------------------------------- */
+    .flow-graph {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: var(--space-xl);
+      overflow-x: auto;
+    }
+
+    .flow-graph svg {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .flow-node {
+      cursor: default;
+    }
+
+    .flow-node rect {
+      rx: 6;
+      ry: 6;
+      stroke-width: 1.5;
+      transition: opacity 150ms ease;
+    }
+
+    .flow-node text {
+      font-family: var(--font-family);
+      fill: var(--color-text);
+      dominant-baseline: central;
+      text-anchor: middle;
+    }
+
+    .flow-node .node-id {
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .flow-node .node-label {
+      font-size: 9px;
+      fill: var(--color-text-muted);
+    }
+
+    .flow-edge {
+      stroke: var(--color-border);
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .flow-edge.verified { stroke: var(--phase-verified); }
+    .flow-edge.progress { stroke: var(--phase-building); }
+
+    .flow-legend {
+      display: flex;
+      gap: var(--space-lg);
+      justify-content: center;
+      margin-top: var(--space-lg);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    .flow-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .flow-legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    /* ---------------------------------------------------------------
        Detail Overlay
        --------------------------------------------------------------- */
     .detail-overlay {
@@ -962,8 +1060,15 @@
 
       <!-- Section 3: Traceability Matrix -->
       <section class="section" id="sectionTrace">
-        <h2 class="section-title">Traceability Matrix</h2>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border);">
+          <h2 style="font-size: var(--font-size-lg); font-weight: 600; color: var(--color-text); margin: 0;">Traceability Matrix</h2>
+          <div style="display: flex; gap: 2px; background: var(--color-secondary); border-radius: var(--radius-sm); padding: 2px;">
+            <button class="view-toggle active" id="toggleTree" onclick="setTraceView('tree')" title="Tree view">Tree</button>
+            <button class="view-toggle" id="toggleGraph" onclick="setTraceView('graph')" title="Flow diagram">Flow</button>
+          </div>
+        </div>
         <div id="traceContent"></div>
+        <div id="traceGraphContent" style="display: none;"></div>
       </section>
 
       <!-- Section 4: Coverage Summary -->
@@ -1003,6 +1108,7 @@
 
     let projectData = null;
     let sseConnected = false;
+    let traceView = 'tree'; // 'tree' or 'graph'
 
     // -------------------------------------------------------------------
     // Data fetching
@@ -1367,8 +1473,8 @@
                     <span class="trace-id">${esc(ac.id)}</span>
                     <span class="trace-title">${esc(ac.given ? `Given ${ac.given}` : '')}</span>
                     <div class="trace-leaf-labels">
-                      <span class="trace-leaf-label ${acBuildStatus.cls}">${esc(acBuildStatus.text)}</span>
-                      <span class="trace-leaf-label ${acTestStatus.cls}">${esc(acTestStatus.text)}</span>
+                      <span class="trace-leaf-label ${acBuildStatus.cls}" title="${acBuildStatus.tip}">${esc(acBuildStatus.text)}</span>
+                      <span class="trace-leaf-label ${acTestStatus.cls}" title="${acTestStatus.tip}">${esc(acTestStatus.text)}</span>
                     </div>
                   </div>`;
           }
@@ -1431,6 +1537,10 @@
 
       const circumference = 2 * Math.PI * 48; // radius = 48
 
+      const coverageNote = acTestPct < 100
+        ? '<p style="color: var(--color-text-muted); font-size: var(--font-size-sm); margin-top: var(--space-lg); text-align: center;">RCF Lite uses advisory coverage gauges. Visual and integration criteria are verified during the <code style="color: var(--color-accent);">/review</code> phase rather than automated tests. Full RCF enforces hard coverage gates.</p>'
+        : '';
+
       container.innerHTML = `
         <div class="coverage-grid">
           ${renderGauge(reqStoryPct, 'Reqs with Stories', circumference)}
@@ -1440,7 +1550,7 @@
             <div class="overall-percent">${overallPct}%</div>
             <div class="overall-label">Overall Coverage</div>
           </div>
-        </div>`;
+        </div>${coverageNote}`;
     }
 
     function renderGauge(pct, label, circumference) {
@@ -1534,25 +1644,28 @@
     function getAcBuildStatus(acId, buildSpecs) {
       for (const bs of (buildSpecs || [])) {
         if ((bs.acceptanceCriteria || []).includes(acId)) {
-          if (bs.status === 'verified') return { text: 'Built', cls: 'verified' };
-          if (['building', 'reviewing', 'testing', 'defining'].includes(bs.status)) return { text: bs.status, cls: 'progress' };
-          return { text: 'Ready', cls: '' };
+          if (bs.status === 'verified') return { text: 'Code complete', cls: 'verified', tip: 'Code implemented, reviewed, and verified' };
+          if (bs.status === 'building') return { text: 'Building', cls: 'progress', tip: 'Code is being written for this criterion' };
+          if (bs.status === 'reviewing') return { text: 'In review', cls: 'progress', tip: 'Code written, under review against standards' };
+          if (bs.status === 'testing') return { text: 'Testing', cls: 'progress', tip: 'Code built, tests are running' };
+          if (bs.status === 'defining') return { text: 'Tests being defined', cls: 'progress', tip: 'Test cases are being written from this criterion' };
+          return { text: 'Queued', cls: '', tip: 'Build spec assigned, waiting to start' };
         }
       }
-      return { text: 'No spec', cls: '' };
+      return { text: 'No build spec', cls: '', tip: 'No build spec covers this criterion yet' };
     }
 
     function getAcTestStatus(acId, testSpecs) {
       for (const ts of (testSpecs || [])) {
         for (const tc of (ts.testCases || [])) {
           if (tc.verifiesAc === acId) {
-            if (tc.status === 'passing') return { text: 'Passing', cls: 'verified' };
-            if (tc.status === 'failing') return { text: 'Failing', cls: 'failing' };
-            return { text: 'Pending', cls: 'progress' };
+            if (tc.status === 'passing') return { text: 'Test passing', cls: 'verified', tip: 'Automated test verifies this criterion' };
+            if (tc.status === 'failing') return { text: 'Test failing', cls: 'failing', tip: 'Automated test exists but is currently failing' };
+            return { text: 'Test defined', cls: 'progress', tip: 'Test case written, not yet run' };
           }
         }
       }
-      return { text: 'No test', cls: '' };
+      return { text: 'Untested', cls: '', tip: 'No automated test covers this criterion -- visual/integration criteria are verified during review instead' };
     }
 
     // Expose toggle function globally for onclick handlers
@@ -1566,6 +1679,142 @@
         toggle.classList.toggle('expanded');
       }
     };
+
+    // --- Trace View Toggle -----------------------------------------------
+
+    window.setTraceView = function(view) {
+      traceView = view;
+      document.getElementById('toggleTree').classList.toggle('active', view === 'tree');
+      document.getElementById('toggleGraph').classList.toggle('active', view === 'graph');
+      document.getElementById('traceContent').style.display = view === 'tree' ? '' : 'none';
+      document.getElementById('traceGraphContent').style.display = view === 'graph' ? '' : 'none';
+      if (view === 'graph') renderFlowGraph();
+    };
+
+    // --- Flow Graph Rendering -------------------------------------------
+
+    function renderFlowGraph() {
+      const container = document.getElementById('traceGraphContent');
+      const { prd, buildSpecs, testSpecs } = projectData;
+
+      if (!prd || !prd.requirements || prd.requirements.length === 0) {
+        container.innerHTML = renderEmptyState('No traceability data.', 'Define requirements first.');
+        return;
+      }
+
+      // Collect all nodes with their type and status
+      const nodes = [];
+      const edges = [];
+
+      // Column layout: REQ -> US -> AC -> BS -> TS
+      const cols = { req: [], us: [], ac: [], bs: [], ts: [] };
+
+      for (const req of prd.requirements) {
+        const reqColour = getReqColour(req, buildSpecs, testSpecs);
+        cols.req.push({ id: req.id, label: req.title, colour: reqColour, type: 'req' });
+
+        for (const story of (req.stories || [])) {
+          cols.us.push({ id: story.id, label: story.title, colour: reqColour, type: 'us' });
+          edges.push({ from: req.id, to: story.id, colour: reqColour });
+
+          for (const ac of (story.acceptanceCriteria || [])) {
+            const buildSt = getAcBuildStatus(ac.id, buildSpecs);
+            const acColour = buildSt.cls === 'verified' ? 'green' : (buildSt.cls === 'progress' ? 'orange' : 'grey');
+            const acLabel = ac.given ? `Given ${ac.given.substring(0, 30)}${ac.given.length > 30 ? '...' : ''}` : ac.id;
+            cols.ac.push({ id: ac.id, label: acLabel, colour: acColour, type: 'ac' });
+            edges.push({ from: story.id, to: ac.id, colour: acColour });
+          }
+        }
+      }
+
+      // Build specs
+      for (const bs of (buildSpecs || [])) {
+        const bsColour = bs.status === 'verified' ? 'green' : (['building','reviewing','testing','defining'].includes(bs.status) ? 'orange' : 'grey');
+        cols.bs.push({ id: bs.id, label: bs.title, colour: bsColour, type: 'bs' });
+
+        // Edges from ACs to build specs
+        for (const acId of (bs.acceptanceCriteria || [])) {
+          edges.push({ from: acId, to: bs.id, colour: bsColour });
+        }
+      }
+
+      // Test specs
+      for (const ts of (testSpecs || [])) {
+        const anyFailing = (ts.testCases || []).some(tc => tc.status === 'failing');
+        const allPassing = (ts.testCases || []).every(tc => tc.status === 'passing');
+        const tsColour = anyFailing ? 'red' : (allPassing ? 'green' : 'orange');
+        const passingCount = (ts.testCases || []).filter(tc => tc.status === 'passing').length;
+        cols.ts.push({ id: ts.id, label: `${passingCount}/${(ts.testCases || []).length} passing`, colour: tsColour, type: 'ts' });
+        edges.push({ from: ts.buildSpec, to: ts.id, colour: tsColour });
+      }
+
+      // Layout calculations
+      const colOrder = ['req', 'us', 'ac', 'bs', 'ts'];
+      const colLabels = { req: 'Requirements', us: 'Stories', ac: 'Criteria', bs: 'Build Specs', ts: 'Tests' };
+      const nodeW = 140, nodeH = 40, colGap = 60, rowGap = 16, headerH = 30, padX = 30, padY = 20;
+      const maxRows = Math.max(...colOrder.map(c => cols[c].length), 1);
+      const svgW = colOrder.length * (nodeW + colGap) - colGap + padX * 2;
+      const svgH = maxRows * (nodeH + rowGap) - rowGap + padY * 2 + headerH;
+
+      // Assign positions
+      const positions = {};
+      for (let ci = 0; ci < colOrder.length; ci++) {
+        const col = colOrder[ci];
+        const items = cols[col];
+        const x = padX + ci * (nodeW + colGap);
+        const totalH = items.length * (nodeH + rowGap) - rowGap;
+        const startY = padY + headerH + (maxRows * (nodeH + rowGap) - rowGap - totalH) / 2;
+        for (let ri = 0; ri < items.length; ri++) {
+          positions[items[ri].id] = { x, y: startY + ri * (nodeH + rowGap), ...items[ri] };
+        }
+      }
+
+      const colourMap = { green: 'var(--phase-verified)', orange: 'var(--phase-building)', grey: 'var(--color-secondary)', red: 'var(--test-failing)' };
+      const fillMap = { green: 'rgba(72,187,120,0.15)', orange: 'rgba(237,137,54,0.15)', grey: 'rgba(113,128,150,0.1)', red: 'rgba(245,101,101,0.15)' };
+
+      let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">`;
+
+      // Column headers
+      for (let ci = 0; ci < colOrder.length; ci++) {
+        const x = padX + ci * (nodeW + colGap) + nodeW / 2;
+        svg += `<text x="${x}" y="${padY + 10}" fill="var(--color-text-muted)" font-size="11" font-weight="600" text-anchor="middle" font-family="var(--font-family)" text-transform="uppercase" letter-spacing="0.05em">${colLabels[colOrder[ci]]}</text>`;
+      }
+
+      // Edges
+      for (const edge of edges) {
+        const from = positions[edge.from];
+        const to = positions[edge.to];
+        if (!from || !to) continue;
+        const x1 = from.x + nodeW;
+        const y1 = from.y + nodeH / 2;
+        const x2 = to.x;
+        const y2 = to.y + nodeH / 2;
+        const cx = (x1 + x2) / 2;
+        svg += `<path class="flow-edge ${edge.colour === 'green' ? 'verified' : (edge.colour === 'orange' ? 'progress' : '')}" d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}" />`;
+      }
+
+      // Nodes
+      for (const [id, pos] of Object.entries(positions)) {
+        const stroke = colourMap[pos.colour] || colourMap.grey;
+        const fill = fillMap[pos.colour] || fillMap.grey;
+        const truncLabel = pos.label.length > 18 ? pos.label.substring(0, 17) + '...' : pos.label;
+        svg += `<g class="flow-node">`;
+        svg += `<rect x="${pos.x}" y="${pos.y}" width="${nodeW}" height="${nodeH}" fill="${fill}" stroke="${stroke}" />`;
+        svg += `<text x="${pos.x + nodeW/2}" y="${pos.y + 15}" class="node-id" fill="var(--color-accent)" font-family="var(--font-family)">${esc(id)}</text>`;
+        svg += `<text x="${pos.x + nodeW/2}" y="${pos.y + 29}" class="node-label" font-family="var(--font-family)">${esc(truncLabel)}</text>`;
+        svg += `</g>`;
+      }
+
+      svg += '</svg>';
+
+      container.innerHTML = `
+        <div class="flow-graph">${svg}</div>
+        <div class="flow-legend">
+          <div class="flow-legend-item"><span class="flow-legend-swatch" style="background: var(--phase-verified);"></span> Verified</div>
+          <div class="flow-legend-item"><span class="flow-legend-swatch" style="background: var(--phase-building);"></span> In progress</div>
+          <div class="flow-legend-item"><span class="flow-legend-swatch" style="background: var(--color-secondary);"></span> Not started</div>
+        </div>`;
+    }
 
     // --- Requirement Detail Overlay ------------------------------------
 
@@ -1615,8 +1864,8 @@
                 <span class="detail-ac-id">${esc(ac.id)}</span>
                 <span class="detail-ac-text">${esc(acText)}</span>
                 <div class="detail-ac-badges">
-                  <span class="trace-leaf-label ${buildStatus.cls}">${esc(buildStatus.text)}</span>
-                  <span class="trace-leaf-label ${testStatus.cls}">${esc(testStatus.text)}</span>
+                  <span class="trace-leaf-label ${buildStatus.cls}" title="${buildStatus.tip}">${esc(buildStatus.text)}</span>
+                  <span class="trace-leaf-label ${testStatus.cls}" title="${testStatus.tip}">${esc(testStatus.text)}</span>
                 </div>
               </li>`;
             }
