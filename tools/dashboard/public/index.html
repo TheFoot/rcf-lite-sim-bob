@@ -298,6 +298,7 @@
       padding: var(--space-sm) var(--space-md);
       border-left: 3px solid var(--color-border);
       transition: border-color var(--transition), background var(--transition);
+      cursor: pointer;
     }
 
     .pipeline-card:hover {
@@ -730,6 +731,188 @@
       white-space: nowrap;
       border: 0;
     }
+
+    /* ---------------------------------------------------------------
+       Detail Overlay
+       --------------------------------------------------------------- */
+    .detail-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .detail-overlay.open {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: var(--space-2xl);
+      overflow-y: auto;
+    }
+
+    .detail-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 720px;
+      padding: var(--space-xl);
+      position: relative;
+    }
+
+    .detail-close {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-lg);
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .detail-close:hover {
+      background: var(--color-secondary);
+      color: var(--color-text);
+    }
+
+    .detail-header {
+      margin-bottom: var(--space-lg);
+      padding-right: var(--space-2xl);
+    }
+
+    .detail-req-id {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-bottom: var(--space-xs);
+    }
+
+    .detail-req-title {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .detail-req-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      line-height: var(--line-height);
+    }
+
+    .detail-section {
+      margin-top: var(--space-lg);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .detail-section-title {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .detail-story {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .detail-story-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .detail-story-id {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    .detail-story-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+    }
+
+    .detail-ac-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .detail-ac-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-xs) 0;
+      font-size: var(--font-size-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .detail-ac-item:last-child {
+      border-bottom: none;
+    }
+
+    .detail-ac-id {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-accent);
+      flex-shrink: 0;
+      min-width: 70px;
+    }
+
+    .detail-ac-text {
+      color: var(--color-text-muted);
+      flex: 1;
+    }
+
+    .detail-ac-badges {
+      display: flex;
+      gap: var(--space-xs);
+      flex-shrink: 0;
+    }
+
+    .detail-bs-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .detail-bs-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-bs-id {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-accent);
+      min-width: 60px;
+    }
+
+    .detail-bs-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      flex: 1;
+    }
   </style>
 </head>
 
@@ -803,6 +986,11 @@
       </div>
     </div>
   </footer>
+
+  <!-- Detail overlay (populated by JS when a requirement is clicked) -->
+  <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-panel" id="detailPanel"></div>
+  </div>
 
   <!-- ====================================================================
        Application logic
@@ -1034,7 +1222,7 @@
             </div>
             <div class="pipeline-cards">
               ${cards.length === 0 ? '' : cards.map(c => `
-                <div class="pipeline-card" data-priority="${c.priority}">
+                <div class="pipeline-card" data-priority="${c.priority}" onclick="showReqDetail('${c.id}')">
                   <div class="req-id">${esc(c.id)}</div>
                   <div class="req-title">${esc(c.title)}</div>
                   <div class="req-meta">
@@ -1378,6 +1566,97 @@
         toggle.classList.toggle('expanded');
       }
     };
+
+    // --- Requirement Detail Overlay ------------------------------------
+
+    window.showReqDetail = function(reqId) {
+      if (!projectData || !projectData.prd) return;
+
+      const req = projectData.prd.requirements.find(r => r.id === reqId);
+      if (!req) return;
+
+      const { buildSpecs, testSpecs } = projectData;
+
+      const reqBuildSpecs = (buildSpecs || []).filter(bs => {
+        const reqs = Array.isArray(bs.requirement) ? bs.requirement : [bs.requirement];
+        return reqs.includes(reqId);
+      });
+
+      let html = `
+        <button class="detail-close" onclick="closeDetail()">&times;</button>
+        <div class="detail-header">
+          <div class="detail-req-id">${esc(reqId)}</div>
+          <div class="detail-req-title">${esc(req.title)}</div>
+          ${req.description ? `<div class="detail-req-desc">${esc(req.description)}</div>` : ''}
+        </div>`;
+
+      // Stories and acceptance criteria
+      if (req.stories && req.stories.length > 0) {
+        html += '<div class="detail-section">';
+        html += '<div class="detail-section-title">User Stories &amp; Acceptance Criteria</div>';
+
+        for (const story of req.stories) {
+          html += `<div class="detail-story">
+            <div class="detail-story-header">
+              <span class="detail-story-id">${esc(story.id)}</span>
+              <span class="detail-story-title">${esc(story.title)}</span>
+            </div>`;
+
+          if (story.acceptanceCriteria && story.acceptanceCriteria.length > 0) {
+            html += '<ul class="detail-ac-list">';
+            for (const ac of story.acceptanceCriteria) {
+              const buildStatus = getAcBuildStatus(ac.id, buildSpecs);
+              const testStatus = getAcTestStatus(ac.id, testSpecs);
+              const acText = ac.given
+                ? `Given ${ac.given}, when ${ac.when || '...'}, then ${ac.then || '...'}`
+                : (ac.description || ac.id);
+
+              html += `<li class="detail-ac-item">
+                <span class="detail-ac-id">${esc(ac.id)}</span>
+                <span class="detail-ac-text">${esc(acText)}</span>
+                <div class="detail-ac-badges">
+                  <span class="trace-leaf-label ${buildStatus.cls}">${esc(buildStatus.text)}</span>
+                  <span class="trace-leaf-label ${testStatus.cls}">${esc(testStatus.text)}</span>
+                </div>
+              </li>`;
+            }
+            html += '</ul>';
+          }
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+
+      // Build specs
+      if (reqBuildSpecs.length > 0) {
+        html += '<div class="detail-section">';
+        html += '<div class="detail-section-title">Build Specs</div>';
+        for (const bs of reqBuildSpecs) {
+          html += `<div class="detail-bs-row">
+            <span class="detail-bs-id">${esc(bs.id)}</span>
+            <span class="detail-bs-title">${esc(bs.title)}</span>
+            <span class="status-badge" data-status="${bs.status}">${esc(bs.status)}</span>
+          </div>`;
+        }
+        html += '</div>';
+      }
+
+      document.getElementById('detailPanel').innerHTML = html;
+      document.getElementById('detailOverlay').classList.add('open');
+    };
+
+    window.closeDetail = function() {
+      document.getElementById('detailOverlay').classList.remove('open');
+    };
+
+    // Close overlay on backdrop click or Escape
+    document.getElementById('detailOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'detailOverlay') closeDetail();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDetail();
+    });
 
     // -------------------------------------------------------------------
     // Init
