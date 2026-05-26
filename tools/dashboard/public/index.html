@@ -1015,12 +1015,20 @@
         });
       }
 
+      const stageTooltips = {
+        defined:  'Requirements captured with acceptance criteria',
+        designed: 'Technical design and build specs generated',
+        building: 'Code is being written against the build spec',
+        testing:  'Tests are running against the built code',
+        verified: 'All tests passing -- requirement is complete and traceable',
+      };
+
       let html = '<div class="pipeline-board">';
       for (const stage of stageOrder) {
         const cards = columns[stage];
         html += `
           <div class="pipeline-column" data-stage="${stage}">
-            <div class="pipeline-column-header">
+            <div class="pipeline-column-header" title="${stageTooltips[stage] || ''}">
               <span>${capitalize(stage)}</span>
               <span class="count">${cards.length}</span>
             </div>
