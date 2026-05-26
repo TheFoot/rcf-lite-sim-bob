@@ -1,4 +1,4 @@
-# RCF Lite Project
+# RCF Project
 
 Structured AI development with the Requirements Confidence Framework.
 
@@ -11,9 +11,9 @@ npm run dev
 
 Open http://localhost:3000
 
-## Using RCF Lite
+## Using RCF
 
-Open this project in Claude Code. The AI will automatically detect your project state and guide you through the RCF Lite pipeline:
+Open this project in Claude Code. The AI will automatically detect your project state and guide you through the RCF pipeline:
 
 1. `/define` -- capture requirements
 2. `/design` -- generate architecture and build specs

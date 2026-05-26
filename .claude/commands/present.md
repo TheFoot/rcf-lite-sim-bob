@@ -14,7 +14,7 @@ Produce materials for presenting this project, including a summary, traceability
    - Key features (from requirements)
 
    ### How AI Was Used
-   - Requirements captured and structured via RCF Lite
+   - Requirements captured and structured via RCF
    - Technical design auto-generated from standards
    - Code generated through the 5-stage build cycle
    - Tests derived from acceptance criteria
@@ -35,7 +35,7 @@ Produce materials for presenting this project, including a summary, traceability
    - Standards applied (list the standards docs)
    - Technology stack summary
 
-   ### What RCF Lite Provides
+   ### What RCF Provides
    - Structured requirements gathering
    - Automatic standards enforcement
    - Traceable code -- every line links to a business requirement
@@ -46,6 +46,6 @@ Produce materials for presenting this project, including a summary, traceability
    - "Every line of code traces back to a business requirement"
    - "Standards are baked into the AI context, not enforced by humans"
    - "The 5-stage build cycle ensures nothing ships without review and tests"
-   - "RCF Lite is the prototyping subset -- full RCF adds architecture docs, build sequencing, and formal test suites"
+   - "RCF is the prototyping subset -- full RCF adds architecture docs, build sequencing, and formal test suites"
 
 3. **Tell the user** the file is ready and suggest they review it. Offer to adjust talking points or emphasis.

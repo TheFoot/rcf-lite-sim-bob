@@ -127,6 +127,24 @@ p + p { margin-top: var(--space-md); }
   border-bottom: 1px solid var(--color-border);
 }
 
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.site-logo {
+  height: 28px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
 .site-title {
   color: var(--color-text);
 }

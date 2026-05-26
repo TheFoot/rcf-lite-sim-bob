@@ -46,7 +46,7 @@ At least one build spec should be verified. If nothing is built yet, tell the us
    **The Solution:** (1 paragraph -- what was built and how it works)
 
    **Built With:**
-   - RCF Lite methodology (structured requirements, traced builds, verified tests)
+   - RCF methodology (structured requirements, traced builds, verified tests)
    - AI-assisted development (Claude Code with custom slash commands)
    - Standards-compliant (list which standards were applied)
 

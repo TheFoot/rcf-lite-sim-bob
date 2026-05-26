@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RCF Lite Dashboard</title>
+  <title>RCF Dashboard</title>
 
   <!-- ====================================================================
        Styles -- dark theme matching the main RCF app
@@ -172,22 +172,21 @@
     .connection-indicator {
       display: flex;
       align-items: center;
-      gap: var(--space-xs);
-      font-size: var(--font-size-sm);
-      color: var(--color-text-muted);
     }
 
     .connection-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--test-failing);
       transition: background var(--transition);
+      opacity: 0.6;
     }
 
     .connection-dot.connected {
       background: var(--test-passing);
-      box-shadow: 0 0 6px var(--test-passing);
+      box-shadow: 0 0 4px var(--test-passing);
+      opacity: 0.8;
     }
 
     /* ---------------------------------------------------------------
@@ -661,6 +660,63 @@
     }
 
     /* ---------------------------------------------------------------
+       Project Overview
+       --------------------------------------------------------------- */
+    .project-overview {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: var(--space-xl);
+    }
+
+    .project-overview-header {
+      margin-bottom: var(--space-lg);
+    }
+
+    .project-overview-name {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .project-overview-description {
+      font-size: var(--font-size-base);
+      color: var(--color-text-muted);
+      line-height: var(--line-height);
+      max-width: 72ch;
+    }
+
+    .project-overview-phase {
+      margin-bottom: var(--space-lg);
+    }
+
+    .project-overview-stats {
+      display: flex;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ---------------------------------------------------------------
        Utility
        --------------------------------------------------------------- */
     .visually-hidden {
@@ -686,13 +742,12 @@
     <div class="container">
       <div class="header-inner">
         <div class="header-left">
-          <h1 class="project-name" id="projectName">RCF Lite</h1>
+          <h1 class="project-name" id="projectName">RCF Dashboard</h1>
           <span class="phase-badge" id="phaseBadge" data-phase="new">New</span>
         </div>
         <div class="header-right">
           <div class="connection-indicator">
-            <span class="connection-dot" id="connectionDot"></span>
-            <span id="connectionLabel">Connecting...</span>
+            <span class="connection-dot" id="connectionDot" title="Live file watcher -- updates dashboard when RCF documents change"></span>
           </div>
         </div>
       </div>
@@ -704,6 +759,11 @@
        ==================================================================== -->
   <main>
     <div class="container">
+
+      <!-- Section 0: Project Overview -->
+      <section class="section" id="sectionOverview">
+        <div id="overviewContent"></div>
+      </section>
 
       <!-- Section 1: Pipeline Board -->
       <section class="section" id="sectionPipeline">
@@ -738,8 +798,7 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer-inner">
-        <span>RCF Lite &mdash; Structured AI Development</span>
-        <a href="https://stravica.ai" target="_blank" rel="noopener">stravica.ai</a>
+        <span>Built on RCF Methodology</span>
         <span class="last-updated" id="lastUpdated">Last updated: --</span>
       </div>
     </div>
@@ -800,13 +859,10 @@
 
     function updateConnectionUI() {
       const dot = document.getElementById('connectionDot');
-      const label = document.getElementById('connectionLabel');
       if (sseConnected) {
         dot.classList.add('connected');
-        label.textContent = 'Live';
       } else {
         dot.classList.remove('connected');
-        label.textContent = 'Reconnecting...';
       }
     }
 
@@ -818,6 +874,7 @@
       if (!projectData) return;
 
       renderHeader();
+      renderOverview();
       renderPipeline();
       renderBuildSpecs();
       renderTrace();
@@ -831,12 +888,63 @@
       const { project } = projectData;
       if (!project) return;
 
-      document.getElementById('projectName').textContent = project.name || 'RCF Lite';
-      document.title = `${project.name || 'RCF Lite'} - Dashboard`;
+      document.getElementById('projectName').textContent = project.name || 'RCF Dashboard';
+      document.title = `${project.name || 'RCF Dashboard'} - Dashboard`;
 
       const badge = document.getElementById('phaseBadge');
       badge.dataset.phase = project.phase || 'new';
       badge.textContent = project.phase || 'new';
+    }
+
+    // --- Project Overview -----------------------------------------------
+
+    function renderOverview() {
+      const container = document.getElementById('overviewContent');
+      const { project, prd, buildSpecs, testSpecs } = projectData;
+
+      if (!project) {
+        container.innerHTML = renderEmptyState(
+          'No project defined yet.',
+          'Open Claude Code and run <code>/define</code> to get started.'
+        );
+        return;
+      }
+
+      const totalReqs = prd?.requirements?.length || 0;
+      const totalAc = (prd?.requirements || []).reduce((sum, r) =>
+        sum + (r.stories || []).reduce((s2, st) => s2 + (st.acceptanceCriteria?.length || 0), 0)
+      , 0);
+
+      const totalBs = (buildSpecs || []).length;
+      const verifiedBs = (buildSpecs || []).filter(bs => bs.status === 'verified').length;
+
+      let passingTests = 0;
+      for (const ts of (testSpecs || [])) {
+        passingTests += (ts.testCases || []).filter(tc => tc.status === 'passing').length;
+      }
+
+      const phase = project.phase || 'new';
+      const description = project.description || '';
+
+      let html = '<div class="project-overview">';
+      html += '<div class="project-overview-header">';
+      html += `<div class="project-overview-name">${esc(project.name || 'Untitled Project')}</div>`;
+      if (description) {
+        html += `<div class="project-overview-description">${esc(description)}</div>`;
+      }
+      html += '</div>';
+      html += `<div class="project-overview-phase">
+        <span class="phase-badge" data-phase="${phase}">${capitalize(phase)}</span>
+      </div>`;
+      html += '<div class="project-overview-stats">';
+      html += `<div class="stat-item"><span class="stat-value">${totalReqs}</span><span class="stat-label">Requirements</span></div>`;
+      html += `<div class="stat-item"><span class="stat-value">${totalAc}</span><span class="stat-label">Acceptance Criteria</span></div>`;
+      html += `<div class="stat-item"><span class="stat-value">${verifiedBs}/${totalBs}</span><span class="stat-label">Build Specs Verified</span></div>`;
+      html += `<div class="stat-item"><span class="stat-value">${passingTests}</span><span class="stat-label">Tests Passing</span></div>`;
+      html += '</div>';
+      html += '</div>';
+
+      container.innerHTML = html;
     }
 
     // --- Pipeline Board ------------------------------------------------
