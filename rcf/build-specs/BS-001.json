@@ -4,12 +4,24 @@
   "description": "Implement the Express server, meeting REST API with flat-file persistence, and frontend components for meeting list, detail, form views. Includes seed data and the SPA shell.",
   "requirement": "REQ-001",
   "story": "US-001",
-  "acceptanceCriteria": ["AC-001-01", "AC-001-02", "AC-001-03", "AC-001-04"],
+  "acceptanceCriteria": [
+    "AC-001-01",
+    "AC-001-02",
+    "AC-001-03",
+    "AC-001-04"
+  ],
   "designContext": "Meeting entity with fields: title (string, required), date (date, required), attendees (string), notes (string). Express server with Helmet, JSON body parsing, CORS, static file serving, and SPA fallback. Flat JSON file persistence in data/meetings.json. Frontend SPA with router, meeting-card, meeting-detail, meeting-form components.",
-  "standards": ["tech-stack", "rest-api", "spa-patterns", "security-baseline", "project-structure"],
+  "standards": [
+    "tech-stack",
+    "rest-api",
+    "spa-patterns",
+    "security-baseline",
+    "project-structure"
+  ],
   "dependencies": [],
-  "status": "ready",
+  "status": "defining",
   "order": 1,
   "created": "2026-05-27T10:20:00.000Z",
-  "updated": "2026-05-27T10:20:00.000Z"
+  "updated": "2026-05-27T10:20:00.000Z",
+  "startedAt": "2026-05-27T10:30:00.000Z"
 }
