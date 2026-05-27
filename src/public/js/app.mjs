@@ -1,48 +1,47 @@
+/**
+ * Meeting Notes -- SPA entry point.
+ * Traces: REQ-001
+ */
+
 import { initRouter, registerRoute, navigate } from './router.mjs';
-import { fetchProjects, fetchProject, createProject, updateProject, deleteProject } from './services/projects-api.mjs';
-import { createProjectCard } from './components/project-card.mjs';
-import { createProjectForm } from './components/project-form.mjs';
-import { createProjectDetail } from './components/project-detail.mjs';
-import { fetchTemplates, fetchTemplate, createTemplate, updateTemplate, deleteTemplate } from './services/templates-api.mjs';
-import { createTemplateCard } from './components/template-card.mjs';
-import { createTemplateForm } from './components/template-form.mjs';
-import { createTemplateDetail } from './components/template-detail.mjs';
-import { renderMarkdownInto } from './markdown.mjs';
-import { fetchSections, fetchSection, createSection, updateSection, deleteSection, transitionSectionStatus } from './services/sections-api.mjs';
-import { createSectionCard } from './components/section-card.mjs';
-import { createSectionDetail } from './components/section-detail.mjs';
-import { createDashboardView } from './components/dashboard-view.mjs';
+import { fetchMeetings, fetchMeeting, createMeeting, updateMeeting, deleteMeeting } from './services/meetings-api.mjs';
+import { createMeetingCard } from './components/meeting-card.mjs';
+import { createMeetingForm } from './components/meeting-form.mjs';
+import { createMeetingDetail } from './components/meeting-detail.mjs';
 
 // ---------------------------------------------------------------------------
-// Route: Dashboard (/)
+// Route: Dashboard (/) -- placeholder until BS-003
 // ---------------------------------------------------------------------------
 
 registerRoute('/', async (container) => {
-  const loading = document.createElement('section');
-  loading.className = 'card';
-  loading.innerHTML = '<h2>Dashboard</h2><p class="text-muted">Loading dashboard data...</p>';
-  container.append(loading);
+  const hero = document.createElement('section');
+  hero.className = 'card';
 
-  try {
-    const res = await fetch('/api/v1/dashboard');
-    if (!res.ok) throw new Error(`Dashboard API error: ${res.status}`);
-    const data = await res.json();
+  const heading = document.createElement('h2');
+  heading.textContent = 'Welcome to Meeting Notes';
+  heading.style.color = 'var(--color-accent)';
 
-    container.innerHTML = '';
-    const dashboardView = createDashboardView(data, {
-      onProjectClick: (id) => navigate(`/projects/${id}`),
-    });
-    container.append(dashboardView);
-  } catch (err) {
-    container.innerHTML = `<section class="card"><h2>Dashboard</h2><p style="color: var(--color-error);">Failed to load: ${err.message}</p></section>`;
-  }
+  const description = document.createElement('p');
+  description.className = 'text-muted';
+  description.textContent = 'Capture, organize, and track action items from team meetings.';
+
+  const meetingsLink = document.createElement('a');
+  meetingsLink.href = '/meetings';
+  meetingsLink.setAttribute('data-link', '');
+  meetingsLink.className = 'btn btn-primary';
+  meetingsLink.textContent = 'View Meetings';
+  meetingsLink.style.marginTop = 'var(--space-lg)';
+  meetingsLink.style.display = 'inline-block';
+
+  hero.append(heading, description, meetingsLink);
+  container.append(hero);
 });
 
 // ---------------------------------------------------------------------------
-// Route: Projects list (/projects)
+// Route: Meetings list (/meetings)
 // ---------------------------------------------------------------------------
 
-registerRoute('/projects', async (container) => {
+registerRoute('/meetings', async (container) => {
   const section = document.createElement('section');
   section.className = 'card';
   container.append(section);
@@ -54,30 +53,30 @@ registerRoute('/projects', async (container) => {
   header.style.marginBottom = 'var(--space-lg)';
 
   const heading = document.createElement('h2');
-  heading.textContent = 'Projects';
+  heading.textContent = 'Meetings';
 
   const newBtn = document.createElement('a');
-  newBtn.href = '/projects/new';
+  newBtn.href = '/meetings/new';
   newBtn.setAttribute('data-link', '');
   newBtn.className = 'btn btn-primary';
-  newBtn.textContent = '+ New Project';
+  newBtn.textContent = '+ New Meeting';
 
   header.append(heading, newBtn);
   section.append(header);
 
   try {
-    const projects = await fetchProjects();
-    if (projects.length === 0) {
+    const meetings = await fetchMeetings();
+    if (meetings.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'text-muted';
-      empty.textContent = 'No projects yet. Create your first project to get started.';
+      empty.textContent = 'No meetings yet. Create your first meeting to get started.';
       section.append(empty);
     } else {
       const grid = document.createElement('div');
       grid.className = 'grid grid--2';
-      for (const project of projects) {
-        const card = createProjectCard(project);
-        card.addEventListener('click', () => navigate(`/projects/${project.id}`));
+      for (const meeting of meetings) {
+        const card = createMeetingCard(meeting);
+        card.addEventListener('click', () => navigate(`/meetings/${meeting.id}`));
         grid.append(card);
       }
       section.append(grid);
@@ -85,31 +84,47 @@ registerRoute('/projects', async (container) => {
   } catch (err) {
     const errMsg = document.createElement('p');
     errMsg.style.color = 'var(--color-error)';
-    errMsg.textContent = `Failed to load projects: ${err.message}`;
+    errMsg.textContent = `Failed to load meetings: ${err.message}`;
     section.append(errMsg);
   }
 });
 
 // ---------------------------------------------------------------------------
-// Route: New project (/projects/new)
+// Route: New meeting (/meetings/new)
 // ---------------------------------------------------------------------------
 
-registerRoute('/projects/new', (container) => {
+registerRoute('/meetings/new', (container) => {
   const section = document.createElement('section');
   section.className = 'card';
 
-  const heading = document.createElement('h2');
-  heading.textContent = 'Create New Project';
-  heading.style.marginBottom = 'var(--space-lg)';
-  section.append(heading);
+  // Breadcrumb
+  const breadcrumb = document.createElement('nav');
+  breadcrumb.className = 'breadcrumb';
+  const backLink = document.createElement('a');
+  backLink.href = '/meetings';
+  backLink.setAttribute('data-link', '');
+  backLink.textContent = 'Meetings';
+  const sep = document.createElement('span');
+  sep.textContent = ' / ';
+  sep.className = 'breadcrumb__separator';
+  const cur = document.createElement('span');
+  cur.textContent = 'New Meeting';
+  cur.className = 'breadcrumb__current';
+  breadcrumb.append(backLink, sep, cur);
 
-  const form = createProjectForm({
+  const heading = document.createElement('h2');
+  heading.textContent = 'Create New Meeting';
+  heading.style.marginBottom = 'var(--space-lg)';
+
+  section.append(breadcrumb, heading);
+
+  const form = createMeetingForm({
     onSubmit: async (data) => {
       try {
-        await createProject(data);
-        navigate('/projects');
+        await createMeeting(data);
+        navigate('/meetings');
       } catch (err) {
-        alert(`Failed to create project: ${err.message}`);
+        alert(`Failed to create meeting: ${err.message}`);
       }
     },
   });
@@ -118,479 +133,26 @@ registerRoute('/projects/new', (container) => {
 });
 
 // ---------------------------------------------------------------------------
-// Route: Project detail (/projects/:id)
+// Route: Meeting detail (/meetings/:id)
 // ---------------------------------------------------------------------------
 
-registerRoute('/projects/:id', async (container, params) => {
+registerRoute('/meetings/:id', async (container, params) => {
   const section = document.createElement('section');
   section.className = 'card';
-  section.innerHTML = '<p class="text-muted">Loading project...</p>';
+  section.innerHTML = '<p class="text-muted">Loading meeting...</p>';
   container.append(section);
 
   try {
-    const project = await fetchProject(params.id);
+    const meeting = await fetchMeeting(params.id);
     section.innerHTML = '';
 
-    const detail = createProjectDetail({
-      item: project,
-      onEdit: () => navigate(`/projects/${project.id}/edit`),
+    const detail = createMeetingDetail({
+      item: meeting,
+      onEdit: () => navigate(`/meetings/${meeting.id}/edit`),
       onDelete: async () => {
         try {
-          await deleteProject(project.id);
-          navigate('/projects');
-        } catch (err) {
-          alert(`Failed to delete: ${err.message}`);
-        }
-      },
-    });
-    section.append(detail);
-
-    // Document assembly panel
-    const assemblyPanel = document.createElement('div');
-    assemblyPanel.style.display = 'flex';
-    assemblyPanel.style.gap = 'var(--space-md)';
-    assemblyPanel.style.marginTop = 'var(--space-lg)';
-
-    const previewBtn = document.createElement('a');
-    previewBtn.href = `/projects/${project.id}/preview`;
-    previewBtn.setAttribute('data-link', '');
-    previewBtn.className = 'btn btn-primary';
-    previewBtn.textContent = 'Preview Document';
-
-    const exportPdfBtn = document.createElement('a');
-    exportPdfBtn.href = `/api/v1/projects/${project.id}/export/pdf`;
-    exportPdfBtn.className = 'btn btn-secondary';
-    exportPdfBtn.textContent = 'Export PDF';
-
-    const exportDocxBtn = document.createElement('a');
-    exportDocxBtn.href = `/api/v1/projects/${project.id}/export/docx`;
-    exportDocxBtn.className = 'btn btn-secondary';
-    exportDocxBtn.textContent = 'Export DOCX';
-
-    assemblyPanel.append(previewBtn, exportPdfBtn, exportDocxBtn);
-    section.append(assemblyPanel);
-
-    // Sections panel
-    const sectionsPanel = document.createElement('section');
-    sectionsPanel.className = 'card';
-    sectionsPanel.style.marginTop = 'var(--space-lg)';
-    container.append(sectionsPanel);
-
-    const sectionsHeader = document.createElement('div');
-    sectionsHeader.style.display = 'flex';
-    sectionsHeader.style.justifyContent = 'space-between';
-    sectionsHeader.style.alignItems = 'center';
-    sectionsHeader.style.marginBottom = 'var(--space-lg)';
-
-    const sectionsHeading = document.createElement('h2');
-    sectionsHeading.textContent = 'Sections';
-
-    const addSectionBtn = document.createElement('a');
-    addSectionBtn.href = `/projects/${project.id}/add-section`;
-    addSectionBtn.setAttribute('data-link', '');
-    addSectionBtn.className = 'btn btn-primary';
-    addSectionBtn.textContent = '+ Add Section';
-
-    sectionsHeader.append(sectionsHeading, addSectionBtn);
-    sectionsPanel.append(sectionsHeader);
-
-    const sections = await fetchSections(project.id);
-    if (sections.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-muted';
-      empty.textContent = 'No sections yet. Add a section from the template library.';
-      sectionsPanel.append(empty);
-    } else {
-      const sectionsList = document.createElement('div');
-      sectionsList.className = 'sections-list';
-      for (const s of sections.sort((a, b) => (a.order || 0) - (b.order || 0))) {
-        const card = createSectionCard(s);
-        card.addEventListener('click', () => navigate(`/sections/${s.id}`));
-        sectionsList.append(card);
-      }
-      sectionsPanel.append(sectionsList);
-    }
-  } catch (err) {
-    section.innerHTML = `<p style="color: var(--color-error);">Project not found: ${err.message}</p>`;
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: Edit project (/projects/:id/edit)
-// ---------------------------------------------------------------------------
-
-registerRoute('/projects/:id/edit', async (container, params) => {
-  const section = document.createElement('section');
-  section.className = 'card';
-  section.innerHTML = '<p class="text-muted">Loading...</p>';
-  container.append(section);
-
-  try {
-    const project = await fetchProject(params.id);
-    section.innerHTML = '';
-
-    const heading = document.createElement('h2');
-    heading.textContent = 'Edit Project';
-    heading.style.marginBottom = 'var(--space-lg)';
-    section.append(heading);
-
-    const form = createProjectForm({
-      item: project,
-      onSubmit: async (data) => {
-        try {
-          await updateProject(project.id, data);
-          navigate(`/projects/${project.id}`);
-        } catch (err) {
-          alert(`Failed to update: ${err.message}`);
-        }
-      },
-    });
-    section.append(form);
-  } catch (err) {
-    section.innerHTML = `<p style="color: var(--color-error);">Project not found: ${err.message}</p>`;
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: Document preview (/projects/:id/preview)
-// ---------------------------------------------------------------------------
-
-registerRoute('/projects/:id/preview', async (container, params) => {
-  const card = document.createElement('section');
-  card.className = 'card';
-  card.innerHTML = '<h2>Assembling Document...</h2><p class="text-muted">Collecting approved sections...</p>';
-  container.append(card);
-
-  try {
-    const res = await fetch(`/api/v1/projects/${params.id}/assemble`);
-    if (!res.ok) throw new Error(`Assembly failed: ${res.status}`);
-    const data = await res.json();
-
-    card.innerHTML = '';
-
-    const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.alignItems = 'center';
-    header.style.marginBottom = 'var(--space-lg)';
-
-    const heading = document.createElement('h2');
-    heading.textContent = 'Document Preview';
-
-    const actions = document.createElement('div');
-    actions.style.display = 'flex';
-    actions.style.gap = 'var(--space-sm)';
-
-    const pdfBtn = document.createElement('a');
-    pdfBtn.href = `/api/v1/projects/${params.id}/export/pdf`;
-    pdfBtn.className = 'btn btn-primary';
-    pdfBtn.textContent = 'Download PDF';
-
-    const docxBtn = document.createElement('a');
-    docxBtn.href = `/api/v1/projects/${params.id}/export/docx`;
-    docxBtn.className = 'btn btn-secondary';
-    docxBtn.textContent = 'Download DOCX';
-
-    const backBtn = document.createElement('a');
-    backBtn.href = `/projects/${params.id}`;
-    backBtn.setAttribute('data-link', '');
-    backBtn.className = 'btn btn-secondary';
-    backBtn.textContent = 'Back to Project';
-
-    actions.append(pdfBtn, docxBtn, backBtn);
-    header.append(heading, actions);
-    card.append(header);
-
-    const info = document.createElement('p');
-    info.className = 'text-muted';
-    info.textContent = `${data.sectionCount} section${data.sectionCount !== 1 ? 's' : ''} assembled.`;
-    card.append(info);
-
-    // Render the assembled HTML in an iframe for proper isolation
-    const frame = document.createElement('iframe');
-    frame.className = 'document-preview-frame';
-    frame.style.width = '100%';
-    frame.style.minHeight = '600px';
-    frame.style.border = '1px solid var(--color-border)';
-    frame.style.borderRadius = 'var(--radius)';
-    frame.style.background = '#fff';
-    card.append(frame);
-
-    // Write HTML to iframe after it's in the DOM
-    setTimeout(() => {
-      const doc = frame.contentDocument || frame.contentWindow.document;
-      doc.open();
-      doc.write(data.html);
-      doc.close();
-    }, 0);
-  } catch (err) {
-    card.innerHTML = `<h2>Document Preview</h2><p style="color: var(--color-error);">Failed to assemble document: ${err.message}</p>`;
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: Add section to project (/projects/:id/add-section)
-// ---------------------------------------------------------------------------
-
-registerRoute('/projects/:id/add-section', async (container, params) => {
-  const section = document.createElement('section');
-  section.className = 'card';
-  container.append(section);
-
-  const heading = document.createElement('h2');
-  heading.textContent = 'Add Section from Template';
-  heading.style.marginBottom = 'var(--space-lg)';
-  section.append(heading);
-
-  try {
-    const templates = await fetchTemplates();
-    if (templates.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-muted';
-      empty.textContent = 'No templates available. Create templates first.';
-      section.append(empty);
-    } else {
-      const grid = document.createElement('div');
-      grid.className = 'grid grid--2';
-      for (const template of templates) {
-        const card = createTemplateCard(template);
-        const addBtn = document.createElement('button');
-        addBtn.className = 'btn btn-primary';
-        addBtn.textContent = 'Add to Project';
-        addBtn.style.marginTop = 'var(--space-sm)';
-        addBtn.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          try {
-            await createSection({ projectId: params.id, templateId: template.id });
-            navigate(`/projects/${params.id}`);
-          } catch (err) {
-            alert(`Failed to add section: ${err.message}`);
-          }
-        });
-        card.append(addBtn);
-        card.style.cursor = 'default';
-        grid.append(card);
-      }
-      section.append(grid);
-    }
-  } catch (err) {
-    const errMsg = document.createElement('p');
-    errMsg.style.color = 'var(--color-error)';
-    errMsg.textContent = `Failed to load templates: ${err.message}`;
-    section.append(errMsg);
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: Section detail (/sections/:id)
-// ---------------------------------------------------------------------------
-
-registerRoute('/sections/:id', async (container, params) => {
-  const card = document.createElement('section');
-  card.className = 'card';
-  card.innerHTML = '<p class="text-muted">Loading section...</p>';
-  container.append(card);
-
-  try {
-    const sectionData = await fetchSection(params.id);
-    card.innerHTML = '';
-
-    const detail = createSectionDetail({
-      item: sectionData,
-      renderMarkdown: renderMarkdownInto,
-      onStatusChange: async (newStatus, approvedBy) => {
-        try {
-          await transitionSectionStatus(sectionData.id, newStatus, approvedBy);
-          navigate(`/sections/${sectionData.id}`);
-        } catch (err) {
-          alert(`Status transition failed: ${err.message}`);
-        }
-      },
-      onEdit: () => navigate(`/sections/${sectionData.id}/edit`),
-      onDelete: async () => {
-        try {
-          await deleteSection(sectionData.id);
-          navigate(`/projects/${sectionData.projectId}`);
-        } catch (err) {
-          alert(`Failed to delete: ${err.message}`);
-        }
-      },
-    });
-    card.append(detail);
-
-    // Back to project link
-    const backLink = document.createElement('a');
-    backLink.href = `/projects/${sectionData.projectId}`;
-    backLink.setAttribute('data-link', '');
-    backLink.className = 'btn btn-secondary';
-    backLink.textContent = 'Back to Project';
-    backLink.style.marginTop = 'var(--space-lg)';
-    backLink.style.display = 'inline-block';
-    card.append(backLink);
-  } catch (err) {
-    card.innerHTML = `<p style="color: var(--color-error);">Section not found: ${err.message}</p>`;
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: Edit section (/sections/:id/edit)
-// ---------------------------------------------------------------------------
-
-registerRoute('/sections/:id/edit', async (container, params) => {
-  const card = document.createElement('section');
-  card.className = 'card';
-  card.innerHTML = '<p class="text-muted">Loading...</p>';
-  container.append(card);
-
-  try {
-    const sectionData = await fetchSection(params.id);
-    card.innerHTML = '';
-
-    const heading = document.createElement('h2');
-    heading.textContent = `Edit: ${sectionData.name}`;
-    heading.style.marginBottom = 'var(--space-lg)';
-    card.append(heading);
-
-    const form = document.createElement('form');
-    form.className = 'template-form';
-
-    const contentLabel = document.createElement('label');
-    contentLabel.textContent = 'Content (Markdown)';
-    contentLabel.setAttribute('for', 'content');
-
-    const contentArea = document.createElement('textarea');
-    contentArea.name = 'content';
-    contentArea.id = 'content';
-    contentArea.rows = 16;
-    contentArea.value = sectionData.content || '';
-
-    const contentGroup = document.createElement('div');
-    contentGroup.className = 'form-group';
-    contentGroup.append(contentLabel, contentArea);
-
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.className = 'btn btn-primary';
-    submitBtn.textContent = 'Save Changes';
-
-    form.append(contentGroup, submitBtn);
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try {
-        await updateSection(sectionData.id, { content: contentArea.value });
-        navigate(`/sections/${sectionData.id}`);
-      } catch (err) {
-        alert(`Failed to save: ${err.message}`);
-      }
-    });
-
-    card.append(form);
-  } catch (err) {
-    card.innerHTML = `<p style="color: var(--color-error);">Section not found: ${err.message}</p>`;
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: Templates list (/templates)
-// ---------------------------------------------------------------------------
-
-registerRoute('/templates', async (container) => {
-  const section = document.createElement('section');
-  section.className = 'card';
-  container.append(section);
-
-  const header = document.createElement('div');
-  header.style.display = 'flex';
-  header.style.justifyContent = 'space-between';
-  header.style.alignItems = 'center';
-  header.style.marginBottom = 'var(--space-lg)';
-
-  const heading = document.createElement('h2');
-  heading.textContent = 'Section Templates';
-
-  const newBtn = document.createElement('a');
-  newBtn.href = '/templates/new';
-  newBtn.setAttribute('data-link', '');
-  newBtn.className = 'btn btn-primary';
-  newBtn.textContent = '+ New Template';
-
-  header.append(heading, newBtn);
-  section.append(header);
-
-  try {
-    const templates = await fetchTemplates();
-    if (templates.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-muted';
-      empty.textContent = 'No templates yet. Create your first template to get started.';
-      section.append(empty);
-    } else {
-      const grid = document.createElement('div');
-      grid.className = 'grid grid--2';
-      for (const template of templates) {
-        const card = createTemplateCard(template);
-        card.addEventListener('click', () => navigate(`/templates/${template.id}`));
-        grid.append(card);
-      }
-      section.append(grid);
-    }
-  } catch (err) {
-    const errMsg = document.createElement('p');
-    errMsg.style.color = 'var(--color-error)';
-    errMsg.textContent = `Failed to load templates: ${err.message}`;
-    section.append(errMsg);
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Route: New template (/templates/new)
-// ---------------------------------------------------------------------------
-
-registerRoute('/templates/new', (container) => {
-  const section = document.createElement('section');
-  section.className = 'card';
-
-  const heading = document.createElement('h2');
-  heading.textContent = 'Create New Template';
-  heading.style.marginBottom = 'var(--space-lg)';
-  section.append(heading);
-
-  const form = createTemplateForm({
-    onSubmit: async (data) => {
-      try {
-        await createTemplate(data);
-        navigate('/templates');
-      } catch (err) {
-        alert(`Failed to create template: ${err.message}`);
-      }
-    },
-  });
-  section.append(form);
-  container.append(section);
-});
-
-// ---------------------------------------------------------------------------
-// Route: Template detail (/templates/:id)
-// ---------------------------------------------------------------------------
-
-registerRoute('/templates/:id', async (container, params) => {
-  const section = document.createElement('section');
-  section.className = 'card';
-  section.innerHTML = '<p class="text-muted">Loading template...</p>';
-  container.append(section);
-
-  try {
-    const template = await fetchTemplate(params.id);
-    section.innerHTML = '';
-
-    const detail = createTemplateDetail({
-      item: template,
-      renderMarkdown: renderMarkdownInto,
-      onEdit: () => navigate(`/templates/${template.id}/edit`),
-      onDelete: async () => {
-        try {
-          await deleteTemplate(template.id);
-          navigate('/templates');
+          await deleteMeeting(meeting.id);
+          navigate('/meetings');
         } catch (err) {
           alert(`Failed to delete: ${err.message}`);
         }
@@ -598,35 +160,58 @@ registerRoute('/templates/:id', async (container, params) => {
     });
     section.append(detail);
   } catch (err) {
-    section.innerHTML = `<p style="color: var(--color-error);">Template not found: ${err.message}</p>`;
+    section.innerHTML = `<p style="color: var(--color-error);">Meeting not found: ${err.message}</p>`;
   }
 });
 
 // ---------------------------------------------------------------------------
-// Route: Edit template (/templates/:id/edit)
+// Route: Edit meeting (/meetings/:id/edit)
 // ---------------------------------------------------------------------------
 
-registerRoute('/templates/:id/edit', async (container, params) => {
+registerRoute('/meetings/:id/edit', async (container, params) => {
   const section = document.createElement('section');
   section.className = 'card';
   section.innerHTML = '<p class="text-muted">Loading...</p>';
   container.append(section);
 
   try {
-    const template = await fetchTemplate(params.id);
+    const meeting = await fetchMeeting(params.id);
     section.innerHTML = '';
 
-    const heading = document.createElement('h2');
-    heading.textContent = 'Edit Template';
-    heading.style.marginBottom = 'var(--space-lg)';
-    section.append(heading);
+    // Breadcrumb
+    const breadcrumb = document.createElement('nav');
+    breadcrumb.className = 'breadcrumb';
+    const meetingsLink = document.createElement('a');
+    meetingsLink.href = '/meetings';
+    meetingsLink.setAttribute('data-link', '');
+    meetingsLink.textContent = 'Meetings';
+    const sep1 = document.createElement('span');
+    sep1.textContent = ' / ';
+    sep1.className = 'breadcrumb__separator';
+    const detailLink = document.createElement('a');
+    detailLink.href = `/meetings/${meeting.id}`;
+    detailLink.setAttribute('data-link', '');
+    detailLink.textContent = meeting.title;
+    const sep2 = document.createElement('span');
+    sep2.textContent = ' / ';
+    sep2.className = 'breadcrumb__separator';
+    const cur = document.createElement('span');
+    cur.textContent = 'Edit';
+    cur.className = 'breadcrumb__current';
+    breadcrumb.append(meetingsLink, sep1, detailLink, sep2, cur);
 
-    const form = createTemplateForm({
-      item: template,
+    const heading = document.createElement('h2');
+    heading.textContent = 'Edit Meeting';
+    heading.style.marginBottom = 'var(--space-lg)';
+
+    section.append(breadcrumb, heading);
+
+    const form = createMeetingForm({
+      item: meeting,
       onSubmit: async (data) => {
         try {
-          await updateTemplate(template.id, data);
-          navigate(`/templates/${template.id}`);
+          await updateMeeting(meeting.id, data);
+          navigate(`/meetings/${meeting.id}`);
         } catch (err) {
           alert(`Failed to update: ${err.message}`);
         }
@@ -634,7 +219,7 @@ registerRoute('/templates/:id/edit', async (container, params) => {
     });
     section.append(form);
   } catch (err) {
-    section.innerHTML = `<p style="color: var(--color-error);">Template not found: ${err.message}</p>`;
+    section.innerHTML = `<p style="color: var(--color-error);">Meeting not found: ${err.message}</p>`;
   }
 });
 

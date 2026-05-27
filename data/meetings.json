@@ -1,0 +1,50 @@
+[
+  {
+    "id": "604a7d71-917a-40e6-b975-8466eff1fe8b",
+    "title": "Sprint Planning - Q3",
+    "date": "2026-05-26",
+    "attendees": "Alice Chen, Bob Smith, Carol Davis",
+    "notes": "Reviewed backlog items for Sprint 12. Committed to 8 story points. Key focus: user authentication module and dashboard redesign.",
+    "createdAt": "2026-05-26T09:00:00.000Z"
+  },
+  {
+    "id": "d4af9fa6-1b7b-46c4-8617-d943a871c142",
+    "title": "Design Review",
+    "date": "2026-05-25",
+    "attendees": "Bob Smith, Elena Foster, Frank Garcia",
+    "notes": "Walked through new component library. Elena will update the style guide by Friday. Frank raised concerns about accessibility on mobile.",
+    "createdAt": "2026-05-25T14:00:00.000Z"
+  },
+  {
+    "id": "03f83e18-29fd-4809-ae00-c45caac2782e",
+    "title": "Weekly Standup",
+    "date": "2026-05-27",
+    "attendees": "Alice Chen, Bob Smith, Carol Davis, David Harris",
+    "notes": "Quick sync on current sprint progress. All tasks on track. David mentioned a blocker with the API integration.",
+    "createdAt": "2026-05-27T10:00:00.000Z"
+  },
+  {
+    "id": "1e28e83f-f3e5-4d27-966a-b3f1e811854f",
+    "title": "Retrospective - Sprint 11",
+    "date": "2026-05-23",
+    "attendees": "Alice Chen, Bob Smith, Carol Davis, Elena Foster",
+    "notes": "What went well: improved code review process. What to improve: better estimation on frontend tasks. Action: Carol to create estimation guidelines.",
+    "createdAt": "2026-05-23T15:00:00.000Z"
+  },
+  {
+    "id": "c7af0254-160a-4011-bd4d-4aa282033cd2",
+    "title": "Product Roadmap Review",
+    "date": "2026-05-20",
+    "attendees": "Alice Chen, Grace Kim, Hector Lopez",
+    "notes": "Reviewed Q3 roadmap priorities. Mobile app feature moved to Q4. Focus remains on platform stability and performance.",
+    "createdAt": "2026-05-20T11:00:00.000Z"
+  },
+  {
+    "id": "157af04f-318c-4d12-addf-2e89c3b3db35",
+    "title": "Technical Architecture Discussion",
+    "date": "2026-05-19",
+    "attendees": "Bob Smith, David Harris, Frank Garcia",
+    "notes": "Evaluated microservices vs monolith for the new payment module. Decision: start monolithic, extract services when load justifies it.",
+    "createdAt": "2026-05-19T13:00:00.000Z"
+  }
+]
