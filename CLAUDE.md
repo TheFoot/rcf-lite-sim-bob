@@ -183,8 +183,11 @@ The CLAUDE.md, standards, and current RCF docs consume context. Be mindful:
    - Wait for the subagent to complete before starting the next spec
 5. After EACH spec completes, update the main session's view: report progress to the user ("BS-001 complete. Starting BS-002...")
 6. After ALL specs complete, regenerate `rcf/trace.json` and run `npm run rcf -- validate`
+7. **Automatically run `/review`.** The build is not finished until review passes. Do not wait for the user to ask -- proceed directly into the review phase.
 
 **NEVER run build specs in the main thread when the Agent tool is available.** The main thread stays clean for user interaction. If the user is watching, they should see progress updates between specs while the dashboard updates in real time.
+
+**NEVER kill the dev server.** Once `npm run dev` starts, it stays running for the rest of the session. The user expects to see the app at any point. If a build subagent starts the dev server, it must leave it running when it finishes.
 
 ### Real-time status updates during builds
 

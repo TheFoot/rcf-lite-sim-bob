@@ -12,6 +12,22 @@ npm install
 
 Open the project in Claude Code. It auto-boots, reads your project state, and tells you what to do next.
 
+## Prerequisites
+
+- **Node.js** v20+ (https://nodejs.org)
+- **Claude Code** - `npm install -g @anthropic-ai/claude-code`
+- **Playwright MCP** (required for `/review` phase) - add to your Claude Code MCP config:
+  ```json
+  {
+    "mcpServers": {
+      "playwright": {
+        "command": "npx",
+        "args": ["@anthropic-ai/mcp-server-playwright"]
+      }
+    }
+  }
+  ```
+
 ## Commands
 
 | Command | What it does |
