@@ -49,6 +49,15 @@ async function listActionItems(req, res) {
   if (req.query.meetingId) {
     records = records.filter((r) => r.meetingId === req.query.meetingId);
   }
+  // Optional status filter
+  if (req.query.status) {
+    records = records.filter((r) => r.status === req.query.status);
+  }
+  // Optional assignee filter (partial match, case-insensitive)
+  if (req.query.assignee) {
+    const term = req.query.assignee.toLowerCase();
+    records = records.filter((r) => r.assignee && r.assignee.toLowerCase().includes(term));
+  }
   res.json(records);
 }
 

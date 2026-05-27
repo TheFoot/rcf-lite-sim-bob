@@ -350,3 +350,28 @@
   align-items: center;
   font-size: var(--font-size-sm);
 }
+
+/* ==========================================================================
+   Search and Filter Controls
+   ========================================================================== */
+
+.search-input {
+  width: 100%;
+  display: block;
+}
+
+.filter-bar {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  min-width: 10rem;
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 10rem;
+}
