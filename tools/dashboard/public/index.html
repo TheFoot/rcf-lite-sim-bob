@@ -1294,7 +1294,8 @@
       html += '<div class="project-overview-header">';
       html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);">`;
       html += `<div class="project-overview-name"><span style="color: var(--color-text-muted); font-weight: 400;">Project:</span> ${esc(project.name || 'Untitled Project')}</div>`;
-      html += `<a href="http://localhost:3000" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-md); background: var(--color-accent); color: var(--color-bg); border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: 600; text-decoration: none; white-space: nowrap; transition: opacity 150ms;">Open App &#8599;</a>`;
+      const appPort = projectData?._meta?.appPort || 3000;
+      html += `<a href="http://localhost:${appPort}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-md); background: var(--color-accent); color: var(--color-bg); border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: 600; text-decoration: none; white-space: nowrap; transition: opacity 150ms;">Open App &#8599;</a>`;
       html += '</div>';
       if (description) {
         html += `<div class="project-overview-description">${esc(description)}</div>`;
@@ -1365,14 +1366,15 @@
 
         let stage = 'defined'; // default
         if (reqSpecs.length > 0) {
-          // Furthest stage among build specs
-          let maxIdx = 0;
+          // LEAST advanced spec determines the requirement's stage.
+          // A requirement isn't "verified" until ALL its specs are verified.
+          let minIdx = stageOrder.length - 1;
           for (const bs of reqSpecs) {
             const mapped = stageMap[bs.status] || 'defined';
             const idx = stageOrder.indexOf(mapped);
-            if (idx > maxIdx) maxIdx = idx;
+            if (idx < minIdx) minIdx = idx;
           }
-          stage = stageOrder[maxIdx];
+          stage = stageOrder[minIdx];
         }
 
         // If there are build specs but the req has no stage past defined,

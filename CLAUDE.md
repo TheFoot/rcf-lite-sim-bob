@@ -11,10 +11,12 @@ On EVERY new conversation, before responding to the user's first message, you MU
 3. Read `rcf/prd.json`, `rcf/design.json` if they exist
 4. Scan `rcf/build-specs/` for existing build specs and their statuses
 5. Scan `rcf/tests/` for existing test specs
-6. **Start the dashboard** (if a project exists):
-   - Run `npm run dashboard &` in the background (serves on port 3001)
-   - Open `http://localhost:3001` in the browser
-   - Tell the user: "Dashboard is running at http://localhost:3001 -- keep it open alongside this session to see real-time progress as we work."
+6. **Resolve ports and start the dashboard** (if a project exists):
+   - Check `rcf/project.json` for a `ports` field. If it exists, use those ports. If not, find free ports starting from 3000 (app) and 3001 (dashboard), and write them to `project.json` as `"ports": { "app": NNNN, "dashboard": NNNN }`. A helper is at `tools/lib/find-port.mjs` -- use `resolveProjectPorts(process.cwd())` or check manually with `lsof -iTCP:3000 -sTCP:LISTEN`.
+   - Start the dashboard: `npm run dashboard &` (it reads its port from project.json)
+   - Open the dashboard URL in the browser
+   - Tell the user: "Dashboard is running at http://localhost:NNNN -- keep it open alongside this session to see real-time progress as we work."
+   - When starting the app (`npm run dev`), it also reads its port from project.json. All port references (dashboard "Open App" link, console output, user instructions) use these persisted ports.
 
 Then determine your response:
 

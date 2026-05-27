@@ -29,10 +29,18 @@ const { values: args } = parseArgs({
   strict: false,
 });
 
-const PORT = Number(args.port);
 const PROJECT_ROOT = resolve(args.root);
 const RCF_DIR = join(PROJECT_ROOT, 'rcf');
 const PUBLIC_DIR = new URL('./public/', import.meta.url).pathname;
+
+let PORT = Number(args.port);
+let APP_PORT = 3000;
+try {
+  const projRaw = await readFile(join(RCF_DIR, 'project.json'), 'utf8');
+  const proj = JSON.parse(projRaw);
+  if (proj.ports?.dashboard && args.port === '3001') PORT = proj.ports.dashboard;
+  if (proj.ports?.app) APP_PORT = proj.ports.app;
+} catch {}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -99,6 +107,7 @@ async function getProjectData() {
       rootDir: PROJECT_ROOT,
       rcfDir: RCF_DIR,
       timestamp: new Date().toISOString(),
+      appPort: APP_PORT,
     },
   };
 }

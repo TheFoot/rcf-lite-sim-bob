@@ -7,7 +7,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+import { readFileSync } from 'node:fs';
+
+let configuredPort = 3000;
+try {
+  const proj = JSON.parse(readFileSync('rcf/project.json', 'utf8'));
+  if (proj.ports?.app) configuredPort = proj.ports.app;
+} catch {}
+const PORT = process.env.PORT || configuredPort;
 
 // ---------------------------------------------------------------------------
 // Middleware
