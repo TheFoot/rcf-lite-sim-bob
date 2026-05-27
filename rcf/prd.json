@@ -1,0 +1,199 @@
+{
+  "name": "Regulatory Document Builder",
+  "description": "A tool for teams assembling regulatory filings (prospectuses, offering memoranda) to manage documents made up of reusable sections, each with its own approval workflow.",
+  "created": "2026-05-27T10:00:00.000Z",
+  "updated": "2026-05-27T10:00:00.000Z",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "Project Management",
+      "description": "Create and manage document projects (e.g. Q3 Prospectus Update) with metadata, deadline, assigned team. Full CRUD -- create projects, view them, edit details, archive when done.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-001",
+          "title": "Manage document projects",
+          "asA": "regulatory filing team member",
+          "iWant": "to create, view, edit, and archive document projects",
+          "soThat": "I can track and organise our regulatory filings",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-001-01",
+              "given": "I am on the projects page",
+              "when": "I click 'New Project' and fill in name, description, deadline, and team",
+              "then": "a new project is created and appears in the project list"
+            },
+            {
+              "id": "AC-001-02",
+              "given": "a project exists",
+              "when": "I click on it in the list",
+              "then": "I see the full project detail view with all metadata"
+            },
+            {
+              "id": "AC-001-03",
+              "given": "I am viewing a project detail",
+              "when": "I click Edit and change fields then save",
+              "then": "the project is updated and changes persist"
+            },
+            {
+              "id": "AC-001-04",
+              "given": "I am viewing a project detail",
+              "when": "I click Delete and confirm",
+              "then": "the project is removed from the system"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "title": "Section Library",
+      "description": "Reusable section templates (risk factors, management discussion, financial summary, legal disclaimers). Sections written in markdown, displayed as formatted rich text. Adding a section to a project creates an editable working copy from the template. Full CRUD on templates and working copies.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-002",
+          "title": "Manage section templates",
+          "asA": "regulatory filing team member",
+          "iWant": "to create, view, edit, and delete reusable section templates",
+          "soThat": "I have a library of standard sections to draw from",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-002-01",
+              "given": "I am on the section templates page",
+              "when": "I click 'New Template' and fill in name, category, and markdown content",
+              "then": "a new template is created and appears in the library"
+            },
+            {
+              "id": "AC-002-02",
+              "given": "a template exists",
+              "when": "I view its detail page",
+              "then": "the markdown content is rendered as formatted rich text"
+            },
+            {
+              "id": "AC-002-03",
+              "given": "I am viewing a template",
+              "when": "I edit it and save",
+              "then": "the template is updated"
+            },
+            {
+              "id": "AC-002-04",
+              "given": "I am viewing a template",
+              "when": "I delete it",
+              "then": "it is removed from the library"
+            }
+          ]
+        },
+        {
+          "id": "US-003",
+          "title": "Add sections to projects",
+          "asA": "regulatory filing team member",
+          "iWant": "to add a template to a project as an editable working copy",
+          "soThat": "I can customise section content for each specific filing",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-003-01",
+              "given": "I am viewing a project",
+              "when": "I click 'Add Section' and select a template",
+              "then": "a working copy of that template is created within the project"
+            },
+            {
+              "id": "AC-003-02",
+              "given": "a working copy exists in a project",
+              "when": "I edit its content and save",
+              "then": "the working copy is updated without affecting the original template"
+            },
+            {
+              "id": "AC-003-03",
+              "given": "a working copy exists in a project",
+              "when": "I view it",
+              "then": "the markdown content renders as formatted rich text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "title": "Section Workflow",
+      "description": "Each section tracks its own status: draft > in-review > approved > locked. Sections can be sent back to draft from review. Show who approved and when.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-004",
+          "title": "Track section approval workflow",
+          "asA": "regulatory filing team member",
+          "iWant": "to advance sections through draft, in-review, approved, and locked statuses",
+          "soThat": "I can track the approval state of each section in my filing",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-004-01",
+              "given": "a section is in 'draft' status",
+              "when": "I click 'Submit for Review'",
+              "then": "the section status changes to 'in-review'"
+            },
+            {
+              "id": "AC-004-02",
+              "given": "a section is in 'in-review' status",
+              "when": "I click 'Approve'",
+              "then": "the section status changes to 'approved' and records who approved and when"
+            },
+            {
+              "id": "AC-004-03",
+              "given": "a section is in 'approved' status",
+              "when": "I click 'Lock'",
+              "then": "the section status changes to 'locked' and content becomes read-only"
+            },
+            {
+              "id": "AC-004-04",
+              "given": "a section is in 'in-review' status",
+              "when": "I click 'Send Back to Draft'",
+              "then": "the section status reverts to 'draft'"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "title": "Dashboard",
+      "description": "Project overview showing which sections are blocking, overall completion percentage, team activity, upcoming deadlines.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-005",
+          "title": "View project dashboard",
+          "asA": "regulatory filing team member",
+          "iWant": "to see an overview dashboard with project status, blocking sections, completion percentage, and deadlines",
+          "soThat": "I can quickly understand where things stand across all my filings",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-005-01",
+              "given": "projects exist with sections in various statuses",
+              "when": "I visit the dashboard",
+              "then": "I see a summary card for each project showing completion percentage and deadline"
+            },
+            {
+              "id": "AC-005-02",
+              "given": "projects exist with sections in various statuses",
+              "when": "I visit the dashboard",
+              "then": "I see which sections are blocking (in draft or in-review) across all projects"
+            },
+            {
+              "id": "AC-005-03",
+              "given": "projects exist with team members assigned",
+              "when": "I visit the dashboard",
+              "then": "I see a team activity summary showing recent approvals and status changes"
+            },
+            {
+              "id": "AC-005-04",
+              "given": "projects have deadlines",
+              "when": "I visit the dashboard",
+              "then": "I see upcoming deadlines sorted by urgency"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
