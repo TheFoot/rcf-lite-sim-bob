@@ -13,8 +13,8 @@
     "stories": 5,
     "acceptanceCriteria": 15,
     "buildSpecs": 4,
-    "buildSpecsVerified": 2,
-    "testsPassing": 15,
-    "testsTotal": 15
+    "buildSpecsVerified": 3,
+    "testsPassing": 26,
+    "testsTotal": 26
   }
 }

@@ -1,15 +1,16 @@
 {
   "id": "BS-003",
   "title": "Project Sections and Workflow",
-  "description": "Implement project sections (working copies from templates) with full CRUD and workflow status transitions (draft > in-review > approved > locked, with send-back-to-draft). API includes PATCH endpoint for status transitions that records approver and timestamp. Frontend shows section list within project detail, section detail with workflow action buttons, and markdown rendering.",
+  "description": "Implement project sections (working copies from templates) with full CRUD and workflow status transitions.",
   "requirement": ["REQ-002", "REQ-003"],
   "story": ["US-003", "US-004"],
   "acceptanceCriteria": ["AC-003-01", "AC-003-02", "AC-003-03", "AC-004-01", "AC-004-02", "AC-004-03", "AC-004-04"],
-  "designContext": "Entity: Section with fields id, projectId, templateId, name, content, status (enum: draft, in-review, approved, locked), approvedBy, approvedAt, order, createdAt. POST /api/v1/sections creates a working copy by copying template content. PATCH /api/v1/sections/:id/status accepts {status, approvedBy} and enforces valid transitions. Locked sections cannot be edited. UI shows workflow action buttons contextually based on current status.",
+  "designContext": "Section entity with workflow state machine.",
   "standards": ["rest-api", "spa-patterns", "testing", "security-baseline"],
   "dependencies": ["BS-001", "BS-002"],
-  "status": "ready",
+  "status": "verified",
   "order": 3,
+  "startedAt": "2026-05-27T10:13:00.000Z",
   "created": "2026-05-27T10:02:00.000Z",
-  "updated": "2026-05-27T10:02:00.000Z"
+  "updated": "2026-05-27T10:18:00.000Z"
 }

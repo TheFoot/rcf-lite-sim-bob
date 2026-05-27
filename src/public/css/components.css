@@ -276,3 +276,94 @@
   margin: 0.5rem 0;
   font-size: var(--font-size-sm, 0.875rem);
 }
+
+/* ==========================================================================
+   Section Components
+   ========================================================================== */
+
+.section-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-md, 1rem);
+  cursor: pointer;
+  transition: border-color 150ms ease;
+  margin-bottom: var(--space-sm, 0.5rem);
+}
+
+.section-card:hover {
+  border-color: var(--color-accent);
+}
+
+.section-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md, 1rem);
+}
+
+.section-card__name {
+  margin: 0;
+  font-size: var(--font-size-base, 1rem);
+}
+
+.section-card__meta {
+  display: flex;
+  gap: var(--space-md, 1rem);
+  margin-top: var(--space-xs, 0.25rem);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.sections-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.section-detail__workflow {
+  display: flex;
+  gap: var(--space-md, 1rem);
+  margin: var(--space-lg, 1.5rem) 0;
+  padding: var(--space-md, 1rem);
+  background: var(--color-surface);
+  border-radius: var(--radius);
+}
+
+.section-detail__actions {
+  display: flex;
+  gap: var(--space-md, 1rem);
+  margin-top: var(--space-lg, 1.5rem);
+}
+
+.section-detail__meta {
+  margin-bottom: var(--space-md, 1rem);
+}
+
+.btn--success {
+  background: #22c55e;
+  color: #0f1621;
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-sm, 0.5rem) var(--space-lg, 1.5rem);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn--success:hover {
+  background: #16a34a;
+}
+
+.btn--warning {
+  background: #f59e0b;
+  color: #0f1621;
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-sm, 0.5rem) var(--space-lg, 1.5rem);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn--warning:hover {
+  background: #d97706;
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "7cc7336d-d92b-439c-bcc2-e02df0655026",
+    "projectId": "6fcca6ea-1f04-4bb0-bdbe-d4a2cfec3791",
+    "templateId": "97e0ccd2-eb00-4708-a884-a2c3a43107d6",
+    "name": "Test Template",
+    "content": "## Risk Factors\n\nTest content.",
+    "status": "draft",
+    "approvedBy": null,
+    "approvedAt": null,
+    "order": 1,
+    "createdAt": "2026-05-27T14:15:19.526Z"
+  }
+]
