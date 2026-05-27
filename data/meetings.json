@@ -1,6 +1,6 @@
 [
   {
-    "id": "604a7d71-917a-40e6-b975-8466eff1fe8b",
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "title": "Sprint Planning - Q3",
     "date": "2026-05-26",
     "attendees": "Alice Chen, Bob Smith, Carol Davis",
@@ -8,7 +8,7 @@
     "createdAt": "2026-05-26T09:00:00.000Z"
   },
   {
-    "id": "d4af9fa6-1b7b-46c4-8617-d943a871c142",
+    "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
     "title": "Design Review",
     "date": "2026-05-25",
     "attendees": "Bob Smith, Elena Foster, Frank Garcia",
@@ -16,7 +16,7 @@
     "createdAt": "2026-05-25T14:00:00.000Z"
   },
   {
-    "id": "03f83e18-29fd-4809-ae00-c45caac2782e",
+    "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
     "title": "Weekly Standup",
     "date": "2026-05-27",
     "attendees": "Alice Chen, Bob Smith, Carol Davis, David Harris",
@@ -24,7 +24,7 @@
     "createdAt": "2026-05-27T10:00:00.000Z"
   },
   {
-    "id": "1e28e83f-f3e5-4d27-966a-b3f1e811854f",
+    "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
     "title": "Retrospective - Sprint 11",
     "date": "2026-05-23",
     "attendees": "Alice Chen, Bob Smith, Carol Davis, Elena Foster",
@@ -32,7 +32,7 @@
     "createdAt": "2026-05-23T15:00:00.000Z"
   },
   {
-    "id": "c7af0254-160a-4011-bd4d-4aa282033cd2",
+    "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
     "title": "Product Roadmap Review",
     "date": "2026-05-20",
     "attendees": "Alice Chen, Grace Kim, Hector Lopez",
@@ -40,7 +40,7 @@
     "createdAt": "2026-05-20T11:00:00.000Z"
   },
   {
-    "id": "157af04f-318c-4d12-addf-2e89c3b3db35",
+    "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
     "title": "Technical Architecture Discussion",
     "date": "2026-05-19",
     "attendees": "Bob Smith, David Harris, Frank Garcia",
