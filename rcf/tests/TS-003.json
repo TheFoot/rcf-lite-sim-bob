@@ -1,0 +1,35 @@
+{
+  "id": "TS-003",
+  "buildSpec": "BS-003",
+  "acceptanceCriteria": ["AC-003-01", "AC-003-02", "AC-003-03"],
+  "testCases": [
+    {
+      "id": "TC-003-01",
+      "description": "GET /api/v1/dashboard returns summary stats (totalMeetings, totalActionItems, overdueItems)",
+      "verifiesAc": "AC-003-01",
+      "status": "pending"
+    },
+    {
+      "id": "TC-003-02",
+      "description": "GET /api/v1/dashboard returns recentMeetings array (max 5)",
+      "verifiesAc": "AC-003-02",
+      "status": "pending"
+    },
+    {
+      "id": "TC-003-03",
+      "description": "GET /api/v1/dashboard returns upcomingActionItems sorted by due date",
+      "verifiesAc": "AC-003-03",
+      "status": "pending"
+    },
+    {
+      "id": "TC-003-04",
+      "description": "Dashboard HTML contains app title and stats section",
+      "verifiesAc": "AC-003-01",
+      "status": "pending"
+    }
+  ],
+  "testFile": "src/tests/dashboard.test.mjs",
+  "status": "defined",
+  "created": "2026-05-27T12:00:00.000Z",
+  "updated": "2026-05-27T12:00:00.000Z"
+}
