@@ -1,1 +1,14 @@
-[{"id":"dash-sec-1","projectId":"dash-proj-1","templateId":"dash-tmpl-1","name":"Risk Factors","content":"## Risk","status":"approved","approvedBy":"Alice","approvedAt":"2026-05-20T10:00:00.000Z","order":1,"createdAt":"2026-03-01T00:00:00.000Z"},{"id":"dash-sec-2","projectId":"dash-proj-1","templateId":"dash-tmpl-1","name":"Legal","content":"## Legal","status":"draft","approvedBy":null,"approvedAt":null,"order":2,"createdAt":"2026-03-02T00:00:00.000Z"},{"id":"dash-sec-3","projectId":"dash-proj-1","templateId":"dash-tmpl-1","name":"Financial","content":"## Fin","status":"locked","approvedBy":"Bob","approvedAt":"2026-05-18T14:00:00.000Z","order":3,"createdAt":"2026-03-03T00:00:00.000Z"},{"id":"dash-sec-4","projectId":"dash-proj-2","templateId":"dash-tmpl-1","name":"Risk","content":"## Risk","status":"in-review","approvedBy":null,"approvedAt":null,"order":1,"createdAt":"2026-04-01T00:00:00.000Z"},{"id":"dash-sec-5","projectId":"dash-proj-2","templateId":"dash-tmpl-1","name":"Overview","content":"## Over","status":"locked","approvedBy":"Carla","approvedAt":"2026-05-15T09:00:00.000Z","order":2,"createdAt":"2026-04-02T00:00:00.000Z"}]
+[
+  {
+    "id": "59bde874-e6cb-4140-bfbe-28ab3dfe8acd",
+    "projectId": "ea4643c7-5269-4380-89ed-6526001c870f",
+    "templateId": "788c6225-58fa-411c-952d-cf84adf5b193",
+    "name": "Test Template",
+    "content": "## Risk Factors\n\nTest content.",
+    "status": "draft",
+    "approvedBy": null,
+    "approvedAt": null,
+    "order": 1,
+    "createdAt": "2026-05-27T14:19:08.764Z"
+  }
+]
