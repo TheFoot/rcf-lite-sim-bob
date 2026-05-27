@@ -1,0 +1,121 @@
+{
+  "overview": "A single-page application built with Express.js backend and vanilla JavaScript frontend. Three main entities: Projects, Section Templates, and Project Sections (working copies). Flat JSON file persistence in data/. The dashboard is the landing page, with navigation to project list, template library, and individual project views. Section workflow is handled via status transitions on the ProjectSection entity. Markdown content is rendered client-side using the marked library served from the backend.",
+  "created": "2026-05-27T10:01:00.000Z",
+  "updated": "2026-05-27T10:01:00.000Z",
+  "components": [
+    {
+      "name": "Project Management API",
+      "purpose": "CRUD endpoints for document projects with metadata (name, description, deadline, team, status)",
+      "tracesTo": ["REQ-001"],
+      "technology": "Express.js REST API with flat JSON persistence",
+      "files": ["src/server/routes/projects.mjs"]
+    },
+    {
+      "name": "Section Templates API",
+      "purpose": "CRUD endpoints for reusable section templates with markdown content",
+      "tracesTo": ["REQ-002"],
+      "technology": "Express.js REST API with flat JSON persistence",
+      "files": ["src/server/routes/templates.mjs"]
+    },
+    {
+      "name": "Project Sections API",
+      "purpose": "CRUD endpoints for working copies of sections within projects, including workflow status transitions (draft > in-review > approved > locked)",
+      "tracesTo": ["REQ-002", "REQ-003"],
+      "technology": "Express.js REST API with flat JSON persistence",
+      "files": ["src/server/routes/sections.mjs"]
+    },
+    {
+      "name": "Dashboard UI",
+      "purpose": "Landing page with project summaries, completion percentages, blocking sections, team activity, and upcoming deadlines",
+      "tracesTo": ["REQ-004"],
+      "technology": "Vanilla JavaScript SPA components",
+      "files": ["src/public/js/components/dashboard-view.mjs"]
+    },
+    {
+      "name": "Project UI",
+      "purpose": "Project list, detail, and form views with full CRUD interaction",
+      "tracesTo": ["REQ-001"],
+      "technology": "Vanilla JavaScript SPA components",
+      "files": ["src/public/js/components/project-card.mjs", "src/public/js/components/project-form.mjs", "src/public/js/components/project-detail.mjs"]
+    },
+    {
+      "name": "Template UI",
+      "purpose": "Template library list, detail (with rendered markdown), and form views",
+      "tracesTo": ["REQ-002"],
+      "technology": "Vanilla JavaScript SPA components",
+      "files": ["src/public/js/components/template-card.mjs", "src/public/js/components/template-form.mjs", "src/public/js/components/template-detail.mjs"]
+    },
+    {
+      "name": "Section UI",
+      "purpose": "Section working copy views within projects, with workflow action buttons and markdown rendering",
+      "tracesTo": ["REQ-002", "REQ-003"],
+      "technology": "Vanilla JavaScript SPA components",
+      "files": ["src/public/js/components/section-card.mjs", "src/public/js/components/section-detail.mjs"]
+    },
+    {
+      "name": "SPA Router and App Shell",
+      "purpose": "Client-side routing, navigation, and app bootstrapping",
+      "tracesTo": ["REQ-001", "REQ-002", "REQ-003", "REQ-004"],
+      "technology": "Vanilla JavaScript History API router",
+      "files": ["src/public/js/app.mjs", "src/public/js/router.mjs", "src/public/index.html"]
+    }
+  ],
+  "endpoints": [
+    { "method": "GET", "path": "/api/v1/projects", "purpose": "List all projects", "tracesTo": "REQ-001" },
+    { "method": "GET", "path": "/api/v1/projects/:id", "purpose": "Get single project", "tracesTo": "REQ-001" },
+    { "method": "POST", "path": "/api/v1/projects", "purpose": "Create project", "tracesTo": "REQ-001" },
+    { "method": "PUT", "path": "/api/v1/projects/:id", "purpose": "Update project", "tracesTo": "REQ-001" },
+    { "method": "DELETE", "path": "/api/v1/projects/:id", "purpose": "Delete project", "tracesTo": "REQ-001" },
+    { "method": "GET", "path": "/api/v1/templates", "purpose": "List all templates", "tracesTo": "REQ-002" },
+    { "method": "GET", "path": "/api/v1/templates/:id", "purpose": "Get single template", "tracesTo": "REQ-002" },
+    { "method": "POST", "path": "/api/v1/templates", "purpose": "Create template", "tracesTo": "REQ-002" },
+    { "method": "PUT", "path": "/api/v1/templates/:id", "purpose": "Update template", "tracesTo": "REQ-002" },
+    { "method": "DELETE", "path": "/api/v1/templates/:id", "purpose": "Delete template", "tracesTo": "REQ-002" },
+    { "method": "GET", "path": "/api/v1/sections", "purpose": "List sections (filterable by projectId)", "tracesTo": "REQ-002" },
+    { "method": "GET", "path": "/api/v1/sections/:id", "purpose": "Get single section", "tracesTo": "REQ-002" },
+    { "method": "POST", "path": "/api/v1/sections", "purpose": "Create section (working copy from template)", "tracesTo": "REQ-002" },
+    { "method": "PUT", "path": "/api/v1/sections/:id", "purpose": "Update section content", "tracesTo": "REQ-002" },
+    { "method": "DELETE", "path": "/api/v1/sections/:id", "purpose": "Delete section", "tracesTo": "REQ-002" },
+    { "method": "PATCH", "path": "/api/v1/sections/:id/status", "purpose": "Transition section workflow status", "tracesTo": "REQ-003" },
+    { "method": "GET", "path": "/api/v1/dashboard", "purpose": "Dashboard summary data", "tracesTo": "REQ-004" }
+  ],
+  "dataModel": [
+    {
+      "entity": "Project",
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "UUID" },
+        { "name": "name", "type": "string", "required": true, "description": "Project name" },
+        { "name": "description", "type": "string", "required": false, "description": "Project description" },
+        { "name": "deadline", "type": "string", "required": false, "description": "ISO date" },
+        { "name": "team", "type": "string", "required": false, "description": "Comma-separated team member names" },
+        { "name": "status", "type": "string", "required": true, "description": "active, completed, archived" },
+        { "name": "createdAt", "type": "string", "required": true, "description": "ISO datetime" }
+      ]
+    },
+    {
+      "entity": "Template",
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "UUID" },
+        { "name": "name", "type": "string", "required": true, "description": "Template name" },
+        { "name": "category", "type": "string", "required": true, "description": "risk-factors, management-discussion, financial-summary, legal-disclaimers, other" },
+        { "name": "content", "type": "string", "required": true, "description": "Markdown content" },
+        { "name": "createdAt", "type": "string", "required": true, "description": "ISO datetime" }
+      ]
+    },
+    {
+      "entity": "Section",
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "UUID" },
+        { "name": "projectId", "type": "string", "required": true, "description": "Reference to parent project" },
+        { "name": "templateId", "type": "string", "required": true, "description": "Reference to source template" },
+        { "name": "name", "type": "string", "required": true, "description": "Section name (copied from template)" },
+        { "name": "content", "type": "string", "required": true, "description": "Markdown content (editable working copy)" },
+        { "name": "status", "type": "string", "required": true, "description": "draft, in-review, approved, locked" },
+        { "name": "approvedBy", "type": "string", "required": false, "description": "Name of approver" },
+        { "name": "approvedAt", "type": "string", "required": false, "description": "ISO datetime of approval" },
+        { "name": "order", "type": "number", "required": false, "description": "Display order within project" },
+        { "name": "createdAt", "type": "string", "required": true, "description": "ISO datetime" }
+      ]
+    }
+  ]
+}

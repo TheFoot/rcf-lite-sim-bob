@@ -1,7 +1,7 @@
 {
   "name": "Regulatory Document Builder",
   "description": "A tool for teams assembling regulatory filings to manage documents made up of reusable sections with approval workflows.",
-  "phase": "defined",
+  "phase": "designed",
   "created": "2026-05-27T10:00:00.000Z",
   "updated": "2026-05-27T10:00:00.000Z",
   "ports": {
@@ -12,7 +12,7 @@
     "requirements": 4,
     "stories": 5,
     "acceptanceCriteria": 15,
-    "buildSpecs": 0,
+    "buildSpecs": 4,
     "buildSpecsVerified": 0,
     "testsPassing": 0,
     "testsTotal": 0

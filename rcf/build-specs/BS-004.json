@@ -1,0 +1,15 @@
+{
+  "id": "BS-004",
+  "title": "Dashboard",
+  "description": "Implement the dashboard as the landing page. Shows project summary cards with completion percentages, blocking sections list, team activity feed (recent approvals/status changes), and upcoming deadline timeline. Dashboard data comes from a dedicated API endpoint that aggregates across projects and sections.",
+  "requirement": "REQ-004",
+  "story": "US-005",
+  "acceptanceCriteria": ["AC-005-01", "AC-005-02", "AC-005-03", "AC-005-04"],
+  "designContext": "GET /api/v1/dashboard returns aggregated data: project summaries (name, completion %, deadline, section counts by status), blocking sections (sections not yet approved/locked), team activity (recent status transitions with who/when), upcoming deadlines sorted by urgency. Frontend dashboard-view.mjs component renders summary cards in a grid, a blocking sections list, activity feed, and deadline timeline. This is the default route (/) in the SPA.",
+  "standards": ["rest-api", "spa-patterns", "testing"],
+  "dependencies": ["BS-001", "BS-002", "BS-003"],
+  "status": "ready",
+  "order": 4,
+  "created": "2026-05-27T10:02:00.000Z",
+  "updated": "2026-05-27T10:02:00.000Z"
+}
