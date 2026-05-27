@@ -1,1 +1,1 @@
-[{"id":"6fcca6ea-1f04-4bb0-bdbe-d4a2cfec3791","name":"Test Project","status":"active","createdAt":"2026-05-27T14:15:19.481Z"}]
+[{"id":"dash-proj-1","name":"Test Project A","description":"Desc A","deadline":"2026-08-15T00:00:00.000Z","team":"Alice, Bob","status":"active","createdAt":"2026-01-01T00:00:00.000Z"},{"id":"dash-proj-2","name":"Test Project B","description":"Desc B","deadline":"2026-06-30T00:00:00.000Z","team":"Carla, David","status":"active","createdAt":"2026-02-01T00:00:00.000Z"}]

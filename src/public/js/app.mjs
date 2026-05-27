@@ -11,55 +11,30 @@ import { renderMarkdownInto } from './markdown.mjs';
 import { fetchSections, fetchSection, createSection, updateSection, deleteSection, transitionSectionStatus } from './services/sections-api.mjs';
 import { createSectionCard } from './components/section-card.mjs';
 import { createSectionDetail } from './components/section-detail.mjs';
+import { createDashboardView } from './components/dashboard-view.mjs';
 
 // ---------------------------------------------------------------------------
 // Route: Dashboard (/)
 // ---------------------------------------------------------------------------
 
 registerRoute('/', async (container) => {
-  const section = document.createElement('section');
-  section.className = 'card';
-  section.innerHTML = '<h2>Dashboard</h2><p class="text-muted">Loading dashboard data...</p>';
-  container.append(section);
+  const loading = document.createElement('section');
+  loading.className = 'card';
+  loading.innerHTML = '<h2>Dashboard</h2><p class="text-muted">Loading dashboard data...</p>';
+  container.append(loading);
 
   try {
-    const projects = await fetchProjects();
-    section.innerHTML = '';
+    const res = await fetch('/api/v1/dashboard');
+    if (!res.ok) throw new Error(`Dashboard API error: ${res.status}`);
+    const data = await res.json();
 
-    const heading = document.createElement('h2');
-    heading.textContent = 'Dashboard';
-    section.append(heading);
-
-    if (projects.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-muted';
-      empty.textContent = 'No projects yet. Create your first project to get started.';
-      section.append(empty);
-
-      const createBtn = document.createElement('a');
-      createBtn.href = '/projects/new';
-      createBtn.setAttribute('data-link', '');
-      createBtn.className = 'btn btn-primary';
-      createBtn.textContent = 'Create First Project';
-      section.append(createBtn);
-    } else {
-      const summary = document.createElement('p');
-      summary.className = 'text-muted';
-      summary.textContent = `${projects.length} project${projects.length !== 1 ? 's' : ''} in the system.`;
-      section.append(summary);
-
-      const grid = document.createElement('div');
-      grid.className = 'grid grid--2';
-      grid.style.marginTop = 'var(--space-lg)';
-      for (const project of projects) {
-        const card = createProjectCard(project);
-        card.addEventListener('click', () => navigate(`/projects/${project.id}`));
-        grid.append(card);
-      }
-      section.append(grid);
-    }
+    container.innerHTML = '';
+    const dashboardView = createDashboardView(data, {
+      onProjectClick: (id) => navigate(`/projects/${id}`),
+    });
+    container.append(dashboardView);
   } catch (err) {
-    section.innerHTML = `<h2>Dashboard</h2><p style="color: var(--color-error);">Failed to load: ${err.message}</p>`;
+    container.innerHTML = `<section class="card"><h2>Dashboard</h2><p style="color: var(--color-error);">Failed to load: ${err.message}</p></section>`;
   }
 });
 

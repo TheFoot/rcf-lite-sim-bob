@@ -7,6 +7,7 @@ import { Router } from 'express';
 import { registerProjectRoutes } from './routes/projects.mjs';
 import { registerTemplateRoutes } from './routes/templates.mjs';
 import { registerSectionRoutes } from './routes/sections.mjs';
+import { registerDashboardRoutes } from './routes/dashboard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -73,6 +74,7 @@ app.get('/api/v1/health', (_req, res) => {
 registerProjectRoutes(apiRouter);
 registerTemplateRoutes(apiRouter);
 registerSectionRoutes(apiRouter);
+registerDashboardRoutes(apiRouter);
 
 app.use('/api/v1', apiRouter);
 

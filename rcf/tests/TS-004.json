@@ -1,0 +1,16 @@
+{
+  "id": "TS-004",
+  "buildSpec": "BS-004",
+  "acceptanceCriteria": ["AC-005-01", "AC-005-02", "AC-005-03", "AC-005-04"],
+  "testCases": [
+    { "id": "TC-004-01", "description": "GET /api/v1/dashboard returns project summaries with completion percentages", "verifiesAc": "AC-005-01", "status": "passing" },
+    { "id": "TC-004-02", "description": "GET /api/v1/dashboard returns blocking sections list", "verifiesAc": "AC-005-02", "status": "passing" },
+    { "id": "TC-004-03", "description": "GET /api/v1/dashboard returns team activity feed", "verifiesAc": "AC-005-03", "status": "passing" },
+    { "id": "TC-004-04", "description": "GET /api/v1/dashboard returns upcoming deadlines sorted by urgency", "verifiesAc": "AC-005-04", "status": "passing" },
+    { "id": "TC-004-05", "description": "Dashboard HTML page contains project summary elements", "verifiesAc": "AC-005-01", "status": "passing" }
+  ],
+  "testFile": "src/tests/dashboard.test.mjs",
+  "status": "passed",
+  "created": "2026-05-27T10:19:00.000Z",
+  "updated": "2026-05-27T10:24:00.000Z"
+}

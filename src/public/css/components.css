@@ -367,3 +367,121 @@
 .btn--warning:hover {
   background: #d97706;
 }
+
+/* ==========================================================================
+   Dashboard
+   ========================================================================== */
+
+.dashboard__hero {
+  margin-bottom: var(--space-xl, 2rem);
+}
+
+.dashboard__hero h2 {
+  color: var(--color-accent);
+}
+
+.dashboard__projects {
+  margin-bottom: var(--space-lg, 1.5rem);
+}
+
+.dashboard-project-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-lg, 1.5rem);
+  transition: border-color 150ms ease;
+}
+
+.dashboard-project-card:hover {
+  border-color: var(--color-accent);
+}
+
+.dashboard-project-card h4 {
+  margin-bottom: var(--space-sm, 0.5rem);
+  color: var(--color-text);
+}
+
+.dashboard-project-card__statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: var(--space-sm, 0.5rem);
+}
+
+.dashboard-project-card__statuses .badge {
+  font-size: 0.75rem;
+}
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  margin: var(--space-sm, 0.5rem) 0;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 4px;
+  transition: width 300ms ease;
+}
+
+/* Blocking list */
+.blocking-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.5rem);
+  padding: var(--space-sm, 0.5rem) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.blocking-item:last-child {
+  border-bottom: none;
+}
+
+/* Activity list */
+.activity-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm, 0.5rem);
+  padding: var(--space-sm, 0.5rem) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+/* Deadline list */
+.deadline-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md, 1rem);
+  padding: var(--space-sm, 0.5rem) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.deadline-item:last-child {
+  border-bottom: none;
+}
+
+.deadline-item__name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.deadline-item__date {
+  color: var(--color-text-muted);
+}
+
+.deadline-item__days {
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.deadline-item__days.is-urgent {
+  color: #f59e0b;
+}
