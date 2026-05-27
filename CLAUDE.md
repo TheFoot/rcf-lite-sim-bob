@@ -95,6 +95,7 @@ Review your own work against the build spec. Check:
 - Does it follow the standards in `standards/`?
 - Are there any obvious bugs or security issues?
 - **Layout polish (for any frontend work):** headings have adequate margin top/bottom; column widths are proportional to content (text-heavy columns wider than badge/action columns); text has breathing room (padding, line-height); list/board containers have `max-height` with `overflow-y: auto`.
+- **Navigation (for any frontend work):** every detail page has a breadcrumb or back-link to its parent list page. Every form page (create/edit) has navigation back to the parent. Users must never be stranded on a page with no clear way back. Use the `createBreadcrumb()` helper in `app.mjs`.
 
 If you find issues, fix them before proceeding.
 

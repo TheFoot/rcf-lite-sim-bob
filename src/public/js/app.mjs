@@ -1,4 +1,30 @@
 import { initRouter, registerRoute, navigate } from './router.mjs';
+
+function createBreadcrumb(crumbs) {
+  const nav = document.createElement('nav');
+  nav.className = 'breadcrumb';
+  crumbs.forEach((crumb, i) => {
+    if (i > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'breadcrumb__separator';
+      sep.textContent = '/';
+      nav.append(sep);
+    }
+    if (crumb.href) {
+      const link = document.createElement('a');
+      link.href = crumb.href;
+      link.setAttribute('data-link', '');
+      link.textContent = crumb.label;
+      nav.append(link);
+    } else {
+      const span = document.createElement('span');
+      span.className = 'breadcrumb__current';
+      span.textContent = crumb.label;
+      nav.append(span);
+    }
+  });
+  return nav;
+}
 import { fetchProjects, fetchProject, createProject, updateProject, deleteProject } from './services/projects-api.mjs';
 import { createProjectCard } from './components/project-card.mjs';
 import { createProjectForm } from './components/project-form.mjs';
@@ -98,6 +124,11 @@ registerRoute('/projects/new', (container) => {
   const section = document.createElement('section');
   section.className = 'card';
 
+  section.append(createBreadcrumb([
+    { label: 'Projects', href: '/projects' },
+    { label: 'New Project' },
+  ]));
+
   const heading = document.createElement('h2');
   heading.textContent = 'Create New Project';
   heading.style.marginBottom = 'var(--space-lg)';
@@ -130,6 +161,11 @@ registerRoute('/projects/:id', async (container, params) => {
   try {
     const project = await fetchProject(params.id);
     section.innerHTML = '';
+
+    section.append(createBreadcrumb([
+      { label: 'Projects', href: '/projects' },
+      { label: project.name },
+    ]));
 
     const detail = createProjectDetail({
       item: project,
@@ -229,6 +265,12 @@ registerRoute('/projects/:id/edit', async (container, params) => {
     const project = await fetchProject(params.id);
     section.innerHTML = '';
 
+    section.append(createBreadcrumb([
+      { label: 'Projects', href: '/projects' },
+      { label: project.name, href: `/projects/${project.id}` },
+      { label: 'Edit' },
+    ]));
+
     const heading = document.createElement('h2');
     heading.textContent = 'Edit Project';
     heading.style.marginBottom = 'var(--space-lg)';
@@ -267,6 +309,12 @@ registerRoute('/projects/:id/preview', async (container, params) => {
     const data = await res.json();
 
     card.innerHTML = '';
+
+    card.append(createBreadcrumb([
+      { label: 'Projects', href: '/projects' },
+      { label: 'Project', href: `/projects/${params.id}` },
+      { label: 'Document Preview' },
+    ]));
 
     const header = document.createElement('div');
     header.style.display = 'flex';
@@ -337,6 +385,12 @@ registerRoute('/projects/:id/add-section', async (container, params) => {
   section.className = 'card';
   container.append(section);
 
+  section.append(createBreadcrumb([
+    { label: 'Projects', href: '/projects' },
+    { label: 'Project', href: `/projects/${params.id}` },
+    { label: 'Add Section' },
+  ]));
+
   const heading = document.createElement('h2');
   heading.textContent = 'Add Section from Template';
   heading.style.marginBottom = 'var(--space-lg)';
@@ -395,6 +449,12 @@ registerRoute('/sections/:id', async (container, params) => {
     const sectionData = await fetchSection(params.id);
     card.innerHTML = '';
 
+    card.append(createBreadcrumb([
+      { label: 'Projects', href: '/projects' },
+      { label: 'Project', href: `/projects/${sectionData.projectId}` },
+      { label: sectionData.name },
+    ]));
+
     const detail = createSectionDetail({
       item: sectionData,
       renderMarkdown: renderMarkdownInto,
@@ -417,16 +477,6 @@ registerRoute('/sections/:id', async (container, params) => {
       },
     });
     card.append(detail);
-
-    // Back to project link
-    const backLink = document.createElement('a');
-    backLink.href = `/projects/${sectionData.projectId}`;
-    backLink.setAttribute('data-link', '');
-    backLink.className = 'btn btn-secondary';
-    backLink.textContent = 'Back to Project';
-    backLink.style.marginTop = 'var(--space-lg)';
-    backLink.style.display = 'inline-block';
-    card.append(backLink);
   } catch (err) {
     card.innerHTML = `<p style="color: var(--color-error);">Section not found: ${err.message}</p>`;
   }
@@ -445,6 +495,13 @@ registerRoute('/sections/:id/edit', async (container, params) => {
   try {
     const sectionData = await fetchSection(params.id);
     card.innerHTML = '';
+
+    card.append(createBreadcrumb([
+      { label: 'Projects', href: '/projects' },
+      { label: 'Project', href: `/projects/${sectionData.projectId}` },
+      { label: sectionData.name, href: `/sections/${sectionData.id}` },
+      { label: 'Edit' },
+    ]));
 
     const heading = document.createElement('h2');
     heading.textContent = `Edit: ${sectionData.name}`;
@@ -550,6 +607,11 @@ registerRoute('/templates/new', (container) => {
   const section = document.createElement('section');
   section.className = 'card';
 
+  section.append(createBreadcrumb([
+    { label: 'Templates', href: '/templates' },
+    { label: 'New Template' },
+  ]));
+
   const heading = document.createElement('h2');
   heading.textContent = 'Create New Template';
   heading.style.marginBottom = 'var(--space-lg)';
@@ -583,6 +645,11 @@ registerRoute('/templates/:id', async (container, params) => {
     const template = await fetchTemplate(params.id);
     section.innerHTML = '';
 
+    section.append(createBreadcrumb([
+      { label: 'Templates', href: '/templates' },
+      { label: template.name },
+    ]));
+
     const detail = createTemplateDetail({
       item: template,
       renderMarkdown: renderMarkdownInto,
@@ -615,6 +682,12 @@ registerRoute('/templates/:id/edit', async (container, params) => {
   try {
     const template = await fetchTemplate(params.id);
     section.innerHTML = '';
+
+    section.append(createBreadcrumb([
+      { label: 'Templates', href: '/templates' },
+      { label: template.name, href: `/templates/${template.id}` },
+      { label: 'Edit' },
+    ]));
 
     const heading = document.createElement('h2');
     heading.textContent = 'Edit Template';
