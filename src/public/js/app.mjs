@@ -1,6 +1,6 @@
 /**
  * Meeting Notes -- SPA entry point.
- * Traces: REQ-001, REQ-002
+ * Traces: REQ-001, REQ-002, REQ-003
  */
 
 import { initRouter, registerRoute, navigate } from './router.mjs';
@@ -12,33 +12,32 @@ import { fetchActionItems, fetchActionItem, createActionItem, updateActionItem, 
 import { createActionItemCard } from './components/action-item-card.mjs';
 import { createActionItemDetail } from './components/action-item-detail.mjs';
 import { createActionItemForm } from './components/action-item-form.mjs';
+import { createDashboardView } from './components/dashboard-view.mjs';
 
 // ---------------------------------------------------------------------------
-// Route: Dashboard (/) -- placeholder until BS-003
+// Route: Dashboard (/)
 // ---------------------------------------------------------------------------
 
 registerRoute('/', async (container) => {
-  const hero = document.createElement('section');
-  hero.className = 'card';
+  const loading = document.createElement('section');
+  loading.className = 'card';
+  loading.innerHTML = '<h2>Dashboard</h2><p class="text-muted">Loading...</p>';
+  container.append(loading);
 
-  const heading = document.createElement('h2');
-  heading.textContent = 'Welcome to Meeting Notes';
-  heading.style.color = 'var(--color-accent)';
+  try {
+    const res = await fetch('/api/v1/dashboard');
+    if (!res.ok) throw new Error(`Dashboard API error: ${res.status}`);
+    const data = await res.json();
 
-  const description = document.createElement('p');
-  description.className = 'text-muted';
-  description.textContent = 'Capture, organize, and track action items from team meetings.';
-
-  const meetingsLink = document.createElement('a');
-  meetingsLink.href = '/meetings';
-  meetingsLink.setAttribute('data-link', '');
-  meetingsLink.className = 'btn btn-primary';
-  meetingsLink.textContent = 'View Meetings';
-  meetingsLink.style.marginTop = 'var(--space-lg)';
-  meetingsLink.style.display = 'inline-block';
-
-  hero.append(heading, description, meetingsLink);
-  container.append(hero);
+    container.innerHTML = '';
+    const dashboardView = createDashboardView(data, {
+      onMeetingClick: (id) => navigate(`/meetings/${id}`),
+      onActionItemClick: (id) => navigate(`/action-items/${id}`),
+    });
+    container.append(dashboardView);
+  } catch (err) {
+    container.innerHTML = `<section class="card"><h2>Dashboard</h2><p style="color: var(--color-error);">Failed to load: ${err.message}</p></section>`;
+  }
 });
 
 // ---------------------------------------------------------------------------

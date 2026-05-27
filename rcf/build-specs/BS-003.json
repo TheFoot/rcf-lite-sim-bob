@@ -4,12 +4,24 @@
   "description": "Implement the dashboard API endpoint and landing page component showing meeting stats, recent meetings, and upcoming action items.",
   "requirement": "REQ-003",
   "story": "US-003",
-  "acceptanceCriteria": ["AC-003-01", "AC-003-02", "AC-003-03"],
+  "acceptanceCriteria": [
+    "AC-003-01",
+    "AC-003-02",
+    "AC-003-03"
+  ],
   "designContext": "Dashboard API aggregates data from meetings.json and action-items.json. Returns totalMeetings, totalActionItems, overdueItems count, recentMeetings (last 5), and upcomingActionItems (open/in-progress items sorted by due date). Frontend dashboard-view component renders hero section with stats, recent meetings cards, and action items list.",
-  "standards": ["tech-stack", "rest-api", "spa-patterns"],
-  "dependencies": ["BS-001", "BS-002"],
-  "status": "ready",
+  "standards": [
+    "tech-stack",
+    "rest-api",
+    "spa-patterns"
+  ],
+  "dependencies": [
+    "BS-001",
+    "BS-002"
+  ],
+  "status": "verified",
   "order": 3,
   "created": "2026-05-27T10:20:00.000Z",
-  "updated": "2026-05-27T10:20:00.000Z"
+  "updated": "2026-05-27T12:30:00.000Z",
+  "startedAt": "2026-05-27T12:00:00.000Z"
 }
