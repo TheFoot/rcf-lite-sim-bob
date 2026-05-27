@@ -4,12 +4,24 @@
   "description": "Implement action item REST API with flat-file persistence and frontend components for action item management within the meeting context. Action items are linked to meetings via meetingId.",
   "requirement": "REQ-002",
   "story": "US-002",
-  "acceptanceCriteria": ["AC-002-01", "AC-002-02", "AC-002-03"],
+  "acceptanceCriteria": [
+    "AC-002-01",
+    "AC-002-02",
+    "AC-002-03"
+  ],
   "designContext": "ActionItem entity with fields: title (string, required), meetingId (reference, required), assignee (string), dueDate (date), status (enum: open/in-progress/done, default: open). Displayed within meeting detail page. Flat JSON file persistence in data/action-items.json.",
-  "standards": ["tech-stack", "rest-api", "spa-patterns", "security-baseline"],
-  "dependencies": ["BS-001"],
-  "status": "ready",
+  "standards": [
+    "tech-stack",
+    "rest-api",
+    "spa-patterns",
+    "security-baseline"
+  ],
+  "dependencies": [
+    "BS-001"
+  ],
+  "status": "verified",
   "order": 2,
   "created": "2026-05-27T10:20:00.000Z",
-  "updated": "2026-05-27T10:20:00.000Z"
+  "updated": "2026-05-27T11:30:00.000Z",
+  "startedAt": "2026-05-27T11:00:00.000Z"
 }

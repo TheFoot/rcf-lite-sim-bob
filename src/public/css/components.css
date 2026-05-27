@@ -128,3 +128,138 @@
 .badge--in-progress { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
 .badge--done { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
 .badge--overdue { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+/* ==========================================================================
+   Action Item Card
+   ========================================================================== */
+
+.action-item-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: border-color var(--transition);
+  margin-bottom: var(--space-sm);
+}
+
+.action-item-card:hover {
+  border-color: var(--color-accent);
+}
+
+.action-item-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.action-item-card__title {
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+.action-item-card__meta {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.action-items-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   Action Item Detail
+   ========================================================================== */
+
+.action-item-detail {
+  max-width: 48rem;
+}
+
+.action-item-detail h2 {
+  color: var(--color-accent);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.action-item-detail__row {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.action-item-detail__row strong {
+  color: var(--color-text-muted);
+  margin-right: var(--space-sm);
+}
+
+.action-item-detail__status-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-primary, #1a2332);
+  border-radius: var(--radius);
+}
+
+.action-item-detail__actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.btn--status-open {
+  background: rgba(0, 180, 216, 0.2);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.btn--status-in-progress {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.btn--status-done {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid #22c55e;
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Action Item Form
+   ========================================================================== */
+
+.action-item-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 32rem;
+}
+
+.action-item-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.action-item-form label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}

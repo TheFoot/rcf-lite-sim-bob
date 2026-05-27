@@ -10,6 +10,7 @@ import { dirname, join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { Router } from 'express';
 import { registerMeetingRoutes } from './routes/meetings.mjs';
+import { registerActionItemRoutes } from './routes/action-items.mjs';
 import { errorHandler } from './middleware/error-handler.mjs';
 import { rateLimiter } from './middleware/rate-limiter.mjs';
 
@@ -72,6 +73,7 @@ app.get('/api/v1/health', (_req, res) => {
 });
 
 registerMeetingRoutes(apiRouter);
+registerActionItemRoutes(apiRouter);
 
 app.use('/api/v1', apiRouter);
 
