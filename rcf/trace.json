@@ -1,0 +1,69 @@
+{
+  "generated": "2026-05-27T13:30:00.000Z",
+  "chains": [
+    {
+      "requirement": { "id": "REQ-001", "title": "Meeting Management" },
+      "stories": [
+        {
+          "id": "US-001",
+          "title": "Meeting CRUD",
+          "acceptanceCriteria": [
+            { "id": "AC-001-01", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 2, "passingCount": 2 } },
+            { "id": "AC-001-02", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 3, "passingCount": 3 } },
+            { "id": "AC-001-03", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 1, "passingCount": 1 } },
+            { "id": "AC-001-04", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 1, "passingCount": 1 } }
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": { "id": "REQ-002", "title": "Action Item Tracking" },
+      "stories": [
+        {
+          "id": "US-002",
+          "title": "Action Item CRUD",
+          "acceptanceCriteria": [
+            { "id": "AC-002-01", "buildSpec": { "id": "BS-002", "status": "verified" }, "testSpec": { "id": "TS-002", "status": "passed", "testCount": 2, "passingCount": 2 } },
+            { "id": "AC-002-02", "buildSpec": { "id": "BS-002", "status": "verified" }, "testSpec": { "id": "TS-002", "status": "passed", "testCount": 2, "passingCount": 2 } },
+            { "id": "AC-002-03", "buildSpec": { "id": "BS-002", "status": "verified" }, "testSpec": { "id": "TS-002", "status": "passed", "testCount": 2, "passingCount": 2 } }
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": { "id": "REQ-003", "title": "Dashboard Overview" },
+      "stories": [
+        {
+          "id": "US-003",
+          "title": "Dashboard Summary",
+          "acceptanceCriteria": [
+            { "id": "AC-003-01", "buildSpec": { "id": "BS-003", "status": "verified" }, "testSpec": { "id": "TS-003", "status": "passed", "testCount": 2, "passingCount": 2 } },
+            { "id": "AC-003-02", "buildSpec": { "id": "BS-003", "status": "verified" }, "testSpec": { "id": "TS-003", "status": "passed", "testCount": 1, "passingCount": 1 } },
+            { "id": "AC-003-03", "buildSpec": { "id": "BS-003", "status": "verified" }, "testSpec": { "id": "TS-003", "status": "passed", "testCount": 1, "passingCount": 1 } }
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": { "id": "REQ-004", "title": "Search and Filtering" },
+      "stories": [
+        {
+          "id": "US-004",
+          "title": "Search and Filter",
+          "acceptanceCriteria": [
+            { "id": "AC-004-01", "buildSpec": { "id": "BS-004", "status": "verified" }, "testSpec": { "id": "TS-004", "status": "passed", "testCount": 1, "passingCount": 1 } },
+            { "id": "AC-004-02", "buildSpec": { "id": "BS-004", "status": "verified" }, "testSpec": { "id": "TS-004", "status": "passed", "testCount": 2, "passingCount": 2 } }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalRequirements": 4,
+    "totalAcceptanceCriteria": 12,
+    "coveredAcceptanceCriteria": 12,
+    "totalTests": 21,
+    "passingTests": 21,
+    "coveragePercent": 100
+  }
+}
