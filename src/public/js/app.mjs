@@ -67,23 +67,48 @@ registerRoute('/meetings', async (container) => {
   header.append(heading, newBtn);
   section.append(header);
 
+  // Search input
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search meetings by title or notes...';
+  searchInput.className = 'search-input';
+  searchInput.style.marginBottom = 'var(--space-lg)';
+  section.append(searchInput);
+
   try {
     const meetings = await fetchMeetings();
-    if (meetings.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-muted';
-      empty.textContent = 'No meetings yet. Create your first meeting to get started.';
-      section.append(empty);
-    } else {
-      const grid = document.createElement('div');
-      grid.className = 'grid grid--2';
-      for (const meeting of meetings) {
-        const card = createMeetingCard(meeting);
-        card.addEventListener('click', () => navigate(`/meetings/${meeting.id}`));
-        grid.append(card);
+    const grid = document.createElement('div');
+    grid.className = 'grid grid--2';
+    section.append(grid);
+
+    function renderMeetings(filterTerm) {
+      grid.innerHTML = '';
+      const term = (filterTerm || '').toLowerCase().trim();
+      const filtered = term
+        ? meetings.filter((m) =>
+            (m.title || '').toLowerCase().includes(term) ||
+            (m.notes || '').toLowerCase().includes(term)
+          )
+        : meetings;
+
+      if (filtered.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'text-muted';
+        empty.textContent = term
+          ? `No meetings match "${filterTerm}".`
+          : 'No meetings yet. Create your first meeting to get started.';
+        grid.append(empty);
+      } else {
+        for (const meeting of filtered) {
+          const card = createMeetingCard(meeting);
+          card.addEventListener('click', () => navigate(`/meetings/${meeting.id}`));
+          grid.append(card);
+        }
       }
-      section.append(grid);
     }
+
+    renderMeetings('');
+    searchInput.addEventListener('input', () => renderMeetings(searchInput.value));
   } catch (err) {
     const errMsg = document.createElement('p');
     errMsg.style.color = 'var(--color-error)';
@@ -186,22 +211,62 @@ registerRoute('/meetings/:id', async (container, params) => {
     aiHeader.append(aiHeading, addAiBtn);
     aiPanel.append(aiHeader);
 
-    const actionItems = await fetchActionItems(meeting.id);
-    if (actionItems.length === 0) {
-      const empty = document.createElement('p');
-      empty.className = 'text-muted';
-      empty.textContent = 'No action items yet. Add an action item to track follow-ups.';
-      aiPanel.append(empty);
-    } else {
-      const aiList = document.createElement('div');
-      aiList.className = 'action-items-list';
-      for (const ai of actionItems) {
-        const card = createActionItemCard(ai);
-        card.addEventListener('click', () => navigate(`/action-items/${ai.id}`));
-        aiList.append(card);
-      }
-      aiPanel.append(aiList);
+    // Filters for action items
+    const filterBar = document.createElement('div');
+    filterBar.className = 'filter-bar';
+
+    const statusFilter = document.createElement('select');
+    statusFilter.className = 'filter-select';
+    for (const opt of ['All Statuses', 'open', 'in-progress', 'done']) {
+      const option = document.createElement('option');
+      option.value = opt === 'All Statuses' ? '' : opt;
+      option.textContent = opt;
+      statusFilter.append(option);
     }
+
+    const assigneeFilter = document.createElement('input');
+    assigneeFilter.type = 'text';
+    assigneeFilter.placeholder = 'Filter by assignee...';
+    assigneeFilter.className = 'filter-input';
+
+    filterBar.append(statusFilter, assigneeFilter);
+    aiPanel.append(filterBar);
+
+    const actionItems = await fetchActionItems(meeting.id);
+    const aiList = document.createElement('div');
+    aiList.className = 'action-items-list';
+    aiPanel.append(aiList);
+
+    function renderActionItems() {
+      aiList.innerHTML = '';
+      const statusVal = statusFilter.value;
+      const assigneeVal = assigneeFilter.value.toLowerCase().trim();
+
+      const filtered = actionItems.filter((ai) => {
+        if (statusVal && ai.status !== statusVal) return false;
+        if (assigneeVal && !(ai.assignee || '').toLowerCase().includes(assigneeVal)) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'text-muted';
+        empty.textContent = actionItems.length === 0
+          ? 'No action items yet. Add an action item to track follow-ups.'
+          : 'No action items match the current filters.';
+        aiList.append(empty);
+      } else {
+        for (const ai of filtered) {
+          const card = createActionItemCard(ai);
+          card.addEventListener('click', () => navigate(`/action-items/${ai.id}`));
+          aiList.append(card);
+        }
+      }
+    }
+
+    renderActionItems();
+    statusFilter.addEventListener('change', renderActionItems);
+    assigneeFilter.addEventListener('input', renderActionItems);
   } catch (err) {
     section.innerHTML = `<p style="color: var(--color-error);">Meeting not found: ${err.message}</p>`;
   }

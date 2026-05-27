@@ -1,0 +1,32 @@
+{
+  "id": "TS-004",
+  "buildSpec": "BS-004",
+  "acceptanceCriteria": [
+    "AC-004-01",
+    "AC-004-02"
+  ],
+  "testCases": [
+    {
+      "id": "TC-004-01",
+      "description": "Meetings list page contains a search input element",
+      "verifiesAc": "AC-004-01",
+      "status": "passing"
+    },
+    {
+      "id": "TC-004-02",
+      "description": "GET /api/v1/action-items?status=open returns only open items",
+      "verifiesAc": "AC-004-02",
+      "status": "passing"
+    },
+    {
+      "id": "TC-004-03",
+      "description": "GET /api/v1/action-items?assignee=Alice returns items assigned to Alice",
+      "verifiesAc": "AC-004-02",
+      "status": "passing"
+    }
+  ],
+  "testFile": "src/tests/search-filter.test.mjs",
+  "status": "passed",
+  "created": "2026-05-27T13:00:00.000Z",
+  "updated": "2026-05-27T13:30:00.000Z"
+}
