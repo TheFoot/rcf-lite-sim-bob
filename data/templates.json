@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "id": "tmpl-001",
+    "name": "Risk Factors",
+    "category": "risk-factors",
+    "content": "## Risk Factors\n\nInvesting in our securities involves a high degree of risk.\n\n### Market Risk\nOur business is subject to general economic and market conditions.\n\n### Regulatory Risk\nWe operate in a heavily regulated industry.\n\n### Operational Risk\nOur operations are dependent on information technology systems.",
+    "createdAt": "2026-01-15T09:00:00.000Z"
+  },
+  {
+    "id": "tmpl-002",
+    "name": "Management Discussion",
+    "category": "management-discussion",
+    "content": "## Management Discussion and Analysis\n\n### Overview\nThe following provides an analysis of our financial condition.\n\n### Results of Operations\n**Revenue:** Total revenue increased by 12% year-over-year.\n**Net Income:** Net income improved by 18%.",
+    "createdAt": "2026-02-01T10:30:00.000Z"
+  },
+  {
+    "id": "tmpl-003",
+    "name": "Financial Summary",
+    "category": "financial-summary",
+    "content": "## Financial Summary\n\n| Metric | FY 2025 | FY 2024 | Change |\n|--------|---------|---------|--------|\n| Total Revenue | 125.4M | 112.0M | +12.0% |\n| Gross Profit | 78.2M | 68.5M | +14.2% |\n| Net Income | 24.8M | 21.0M | +18.1% |",
+    "createdAt": "2026-02-15T14:00:00.000Z"
+  },
+  {
+    "id": "tmpl-004",
+    "name": "Legal Disclaimers",
+    "category": "legal-disclaimers",
+    "content": "## Legal Disclaimers\n\n### Forward-Looking Statements\nThis document contains forward-looking statements.\n\n### No Offer or Solicitation\nThis does not constitute an offer to sell.",
+    "createdAt": "2026-03-01T08:45:00.000Z"
+  },
+  {
+    "id": "tmpl-005",
+    "name": "Use of Proceeds",
+    "category": "other",
+    "content": "## Use of Proceeds\n\n### Working Capital (40%)\nGeneral corporate purposes.\n\n### R&D (30%)\nExpansion of technology platform.\n\n### Acquisitions (20%)\nSelective strategic acquisitions.\n\n### Debt Reduction (10%)\nReduce outstanding indebtedness.",
+    "createdAt": "2026-03-10T11:00:00.000Z"
+  },
+  {
+    "id": "tmpl-006",
+    "name": "Corporate Governance",
+    "category": "other",
+    "content": "## Corporate Governance\n\n### Board of Directors\nSeven members, five independent.\n\n- **Audit Committee**\n- **Compensation Committee**\n- **Nominating Committee**\n\n### Code of Ethics\nComprehensive Code of Ethics for all personnel.",
+    "createdAt": "2026-03-20T15:30:00.000Z"
+  }
+]

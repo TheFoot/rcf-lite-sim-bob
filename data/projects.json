@@ -1,1 +1,29 @@
-[{"id":"1d7cd505-e365-4efc-8836-31ccaf005414","name":"Test Project","status":"active","createdAt":"2026-05-27T14:22:44.987Z"}]
+[
+  {
+    "id": "proj-001",
+    "name": "Q3 2026 Prospectus Update",
+    "description": "Quarterly update to the main prospectus covering new risk factors and updated financial projections.",
+    "deadline": "2026-09-30T00:00:00.000Z",
+    "team": "Alice Chen, Bob Davis, Carla Martinez",
+    "status": "active",
+    "createdAt": "2026-05-01T09:00:00.000Z"
+  },
+  {
+    "id": "proj-002",
+    "name": "Series B Offering Memorandum",
+    "description": "Complete offering memorandum for Series B preferred stock issuance to institutional investors.",
+    "deadline": "2026-07-15T00:00:00.000Z",
+    "team": "Elena Foster, Frank Garcia, Grace Harris",
+    "status": "active",
+    "createdAt": "2026-04-15T14:30:00.000Z"
+  },
+  {
+    "id": "proj-003",
+    "name": "Annual Registration Statement",
+    "description": "Annual Form 10-K registration statement update with audited financials and management discussion.",
+    "deadline": "2026-12-31T00:00:00.000Z",
+    "team": "Hector Ito, Iris Johnson, James Kim",
+    "status": "active",
+    "createdAt": "2026-03-20T11:15:00.000Z"
+  }
+]
