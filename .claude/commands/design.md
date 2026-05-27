@@ -20,7 +20,7 @@ Read the PRD, apply the standards, and produce a technical design with ordered b
    - Data model (if applicable) -- entities, fields, relationships
    - All technology decisions come from `standards/` -- do not invent or debate.
 
-3. **Generate build specs.** Create one `rcf/build-specs/BS-NNN.json` per user story (or per logical unit of work). Each build spec contains:
+3. **Generate build specs.** Create one `rcf/build-specs/BS-NNN.json` per logical unit of work. Each build spec contains:
    - ID (BS-001, BS-002, etc.)
    - Title and description
    - The requirement and user story it implements (by ID)
@@ -30,7 +30,9 @@ Read the PRD, apply the standards, and produce a technical design with ordered b
    - Status: "ready"
    - Dependency: which build specs must complete first (if any)
 
-   Order build specs by dependency -- foundational work first (data model, core API), features second (UI, integrations).
+   **Balance rule: 3-6 acceptance criteria per spec.** If a spec has more than 6 ACs, split it. Frontend work is especially prone to becoming a single giant spec -- split by view or feature, not "all UI in one spec." A build spec with 14 ACs and one with 3 ACs means the design decomposition failed. The build times and dashboard should show evenly-distributed work.
+
+   Order build specs by dependency -- foundational work first (data model, core API), features second (UI views, integrations). Each frontend view or major feature gets its own spec.
 
 4. **Present for review.** Show:
    - Architecture summary (brief)

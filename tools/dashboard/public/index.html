@@ -1633,6 +1633,8 @@
       const endpoints = design.endpoints || [];
       const dataModel = design.dataModel || design.models || design.entities || [];
 
+      const models = Array.isArray(dataModel) ? dataModel : (design.dataModel ? [design.dataModel] : []);
+
       // Tabs
       let html = '<div class="tech-tabs">';
       html += `<button class="tech-tab ${techTab === 'stack' ? 'active' : ''}" data-tab="stack" onclick="setTechTab('stack')">Tech Stack</button>`;
@@ -1640,12 +1642,13 @@
       if (endpoints.length > 0) {
         html += `<button class="tech-tab ${techTab === 'api' ? 'active' : ''}" data-tab="api" onclick="setTechTab('api')">API Endpoints</button>`;
       }
-      if (dataModel.length > 0 || design.dataModel) {
+      if (models.length > 0) {
         html += `<button class="tech-tab ${techTab === 'data' ? 'active' : ''}" data-tab="data" onclick="setTechTab('data')">Data Model</button>`;
+        html += `<button class="tech-tab ${techTab === 'erd' ? 'active' : ''}" data-tab="erd" onclick="setTechTab('erd')">ER Diagram</button>`;
       }
       html += '</div>';
 
-      // Tab: Tech Stack
+      // Tab: Tech Stack -- show standards-derived detail, not a one-liner
       html += `<div class="tech-tab-panel ${techTab === 'stack' ? 'active' : ''}" id="tech-stack">`;
       const stackItems = design.techStack || design.stack || [];
       if (Array.isArray(stackItems) && stackItems.length > 0) {
@@ -1659,8 +1662,18 @@
         }
         html += '</tbody></table>';
       } else {
-        // Fallback: extract from standards references
-        html += '<div style="color: var(--color-text-muted); font-size: var(--font-size-sm); padding: var(--space-md);">Tech stack is defined in the <code>standards/</code> directory: Node.js, Express.js, vanilla JS SPA.</div>';
+        // Build a meaningful stack summary from standards + design
+        html += '<table class="tech-table"><thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead><tbody>';
+        html += '<tr><td style="font-weight:500;">Runtime</td><td>Node.js v20+</td><td style="color:var(--color-text-muted);">Server runtime, built-in test runner</td></tr>';
+        html += '<tr><td style="font-weight:500;">Backend</td><td>Express.js</td><td style="color:var(--color-text-muted);">REST API framework with middleware pipeline</td></tr>';
+        html += '<tr><td style="font-weight:500;">Frontend</td><td>Vanilla JS SPA</td><td style="color:var(--color-text-muted);">ES modules, component model, hash routing</td></tr>';
+        html += '<tr><td style="font-weight:500;">Persistence</td><td>JSON flat files</td><td style="color:var(--color-text-muted);">Zero-config, portable, file-based storage in data/</td></tr>';
+        html += '<tr><td style="font-weight:500;">Testing</td><td>node:test</td><td style="color:var(--color-text-muted);">Built-in test runner, zero npm dependencies</td></tr>';
+        html += '<tr><td style="font-weight:500;">Security</td><td>Helmet.js + rate limiter</td><td style="color:var(--color-text-muted);">Input sanitisation, CORS, rate limiting</td></tr>';
+        if (components.length > 0) {
+          html += `<tr><td style="font-weight:500;">Architecture</td><td>${components.length} components</td><td style="color:var(--color-text-muted);">${endpoints.length} API endpoints, ${models.length} data entities</td></tr>`;
+        }
+        html += '</tbody></table>';
       }
       html += '</div>';
 
@@ -1700,9 +1713,8 @@
       }
 
       // Tab: Data Model
-      if (dataModel.length > 0 || design.dataModel) {
+      if (models.length > 0) {
         html += `<div class="tech-tab-panel ${techTab === 'data' ? 'active' : ''}" id="tech-data">`;
-        const models = Array.isArray(dataModel) ? dataModel : (design.dataModel ? [design.dataModel] : []);
         for (const model of models) {
           const name = model.name || model.entity || 'Entity';
           const fields = model.fields || model.properties || Object.keys(model).filter(k => !['name','entity','id'].includes(k));
@@ -1719,9 +1731,112 @@
           html += '</div></div>';
         }
         html += '</div>';
+
+        // Tab: ER Diagram
+        html += `<div class="tech-tab-panel ${techTab === 'erd' ? 'active' : ''}" id="tech-erd">`;
+        html += renderERDiagram(models);
+        html += '</div>';
       }
 
       container.innerHTML = html;
+    }
+
+    // --- ER Diagram -------------------------------------------------------
+
+    function renderERDiagram(models) {
+      if (!models || models.length === 0) return renderEmptyState('No data model defined.', '');
+
+      const entityW = 200, entityHeaderH = 32, fieldH = 22, entityPadY = 8, entityGap = 40;
+      const padX = 30, padY = 20;
+
+      // Build entity data with field lists
+      const entities = models.map(m => {
+        const name = m.name || m.entity || 'Entity';
+        const rawFields = m.fields || m.properties || [];
+        const fields = Array.isArray(rawFields) ? rawFields.map(f =>
+          typeof f === 'string' ? { name: f, type: '', fk: false }
+            : { name: f.name || f.field || '', type: f.type || '', fk: !!(f.references || f.ref || (f.name && f.name.endsWith('Id'))) }
+        ) : [];
+        return { name, fields };
+      });
+
+      // Layout: arrange in a grid (max 3 columns)
+      const cols = Math.min(3, entities.length);
+      const positions = [];
+      for (let i = 0; i < entities.length; i++) {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const entityH = entityHeaderH + entities[i].fields.length * fieldH + entityPadY * 2;
+        const maxRowH = Math.max(...entities.filter((_, j) => Math.floor(j / cols) === row).map(e => entityHeaderH + e.fields.length * fieldH + entityPadY * 2));
+        positions.push({
+          x: padX + col * (entityW + entityGap),
+          y: padY + row * (maxRowH + entityGap),
+          w: entityW,
+          h: entityH,
+        });
+      }
+
+      const svgW = cols * (entityW + entityGap) - entityGap + padX * 2;
+      const maxY = Math.max(...positions.map((p, i) => p.y + p.h));
+      const svgH = maxY + padY;
+
+      let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-family);">`;
+
+      // Draw relationship lines first (behind entities)
+      // Detect FK relationships: field names ending in Id or with references
+      for (let i = 0; i < entities.length; i++) {
+        for (const field of entities[i].fields) {
+          if (field.fk) {
+            const targetName = field.name.replace(/Id$/, '').replace(/(_id|_ID)$/, '');
+            const targetIdx = entities.findIndex(e => e.name.toLowerCase() === targetName.toLowerCase() || e.name.toLowerCase() === targetName.toLowerCase() + 's');
+            if (targetIdx >= 0 && targetIdx !== i) {
+              const fromX = positions[i].x + positions[i].w;
+              const fromY = positions[i].y + entityHeaderH + entities[i].fields.indexOf(field) * fieldH + fieldH / 2 + entityPadY;
+              const toX = positions[targetIdx].x;
+              const toY = positions[targetIdx].y + entityHeaderH / 2;
+              const midX = (fromX + toX) / 2;
+              svg += `<path d="M${fromX},${fromY} C${midX},${fromY} ${midX},${toY} ${toX},${toY}" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>`;
+              svg += `<circle cx="${toX}" cy="${toY}" r="4" fill="var(--color-accent)" opacity="0.6"/>`;
+            }
+          }
+        }
+      }
+
+      // Draw entities
+      for (let i = 0; i < entities.length; i++) {
+        const e = entities[i];
+        const p = positions[i];
+
+        // Entity box
+        svg += `<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="6" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"/>`;
+
+        // Header
+        svg += `<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${entityHeaderH}" rx="6" fill="var(--color-accent)" opacity="0.15"/>`;
+        svg += `<rect x="${p.x}" y="${p.y + entityHeaderH - 6}" width="${p.w}" height="6" fill="var(--color-accent)" opacity="0.15"/>`;
+        svg += `<text x="${p.x + p.w / 2}" y="${p.y + entityHeaderH / 2 + 1}" text-anchor="middle" dominant-baseline="central" fill="var(--color-accent)" font-size="13" font-weight="700">${esc(e.name)}</text>`;
+
+        // Fields
+        for (let fi = 0; fi < e.fields.length; fi++) {
+          const f = e.fields[fi];
+          const fy = p.y + entityHeaderH + entityPadY + fi * fieldH;
+          const nameColor = f.fk ? 'var(--color-accent)' : 'var(--color-text)';
+          svg += `<text x="${p.x + 12}" y="${fy + fieldH / 2}" dominant-baseline="central" fill="${nameColor}" font-size="11">${esc(f.name)}</text>`;
+          if (f.type) {
+            svg += `<text x="${p.x + p.w - 12}" y="${fy + fieldH / 2}" dominant-baseline="central" text-anchor="end" fill="var(--color-text-muted)" font-size="10">${esc(f.type)}</text>`;
+          }
+          if (fi < e.fields.length - 1) {
+            svg += `<line x1="${p.x + 8}" y1="${fy + fieldH}" x2="${p.x + p.w - 8}" y2="${fy + fieldH}" stroke="var(--color-border)" stroke-width="0.5" opacity="0.5"/>`;
+          }
+        }
+      }
+
+      svg += '</svg>';
+
+      return `<div class="flow-graph" style="overflow-x: auto;">${svg}</div>
+        <div class="flow-legend" style="margin-top: var(--space-md);">
+          <div class="flow-legend-item"><span style="display:inline-block; width:20px; border-top: 1.5px dashed var(--color-accent); margin-right: var(--space-xs);"></span> Foreign key relationship</div>
+          <div class="flow-legend-item"><span style="color: var(--color-accent); font-weight: 600; margin-right: var(--space-xs);">Field name</span> References another entity</div>
+        </div>`;
     }
 
     // --- Traceability Matrix -------------------------------------------
