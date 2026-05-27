@@ -64,6 +64,7 @@ These are included in `package.json` and available for use when the PRD requires
 
 - **pdfkit** -- PDF document creation. Use for generating reports, invoices, or any PDF output. Import: `import PDFDocument from 'pdfkit'`.
 - **docx** -- DOCX document creation. Use for generating Word documents. Import: `import { Document, Paragraph, TextRun } from 'docx'`.
+- **marked** -- Markdown to HTML conversion. Pure JS, zero transitive deps. Used by the `docs` utility. Import: `import { marked } from 'marked'`.
 
 If additional packages are needed, install via `npm install <package>` and document the justification.
 

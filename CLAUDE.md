@@ -249,6 +249,71 @@ Everything runs on the user's laptop. No exceptions.
 
 If the user asks to connect to an external service, explain: "For this build, we keep everything local and self-contained. We'll use generated mock data instead. This makes the demo reliable and the code portable."
 
+## Workshop utilities
+
+Three utility modules in `tools/utils/` save participants from rebuilding common infrastructure. Use these instead of writing boilerplate from scratch.
+
+### `tools/utils/docs.mjs` -- Document format handling
+
+Converts Markdown to HTML, wraps HTML in styled documents using the dark theme tokens, and exports reports as PDF or DOCX.
+
+Key exports:
+- `renderMarkdown(markdownString)` -- Markdown to HTML fragment (GFM enabled).
+- `renderStyledHtml(bodyHtml, { title, theme })` -- wraps HTML in a complete styled document using `standards/spa-patterns.md` theme tokens.
+- `createPdf({ title, sections })` -- returns a `Promise<Buffer>` of a PDF with title page + section pages. Each section is `{ heading, body }`.
+- `createDocx({ title, sections })` -- same input shape, returns DOCX buffer.
+- `exportReport(data, format)` -- convenience wrapper. `format` is `'html'` | `'pdf'` | `'docx'`.
+
+Use when: a build spec requires report generation, document export, or Markdown rendering.
+
+### `tools/utils/scaffold.mjs` -- CRUD scaffolder
+
+Generates standards-compliant CRUD files for an entity definition. Zero external deps.
+
+Key exports:
+- `scaffoldEntity(entity, projectRoot)` -- generates 5 files per entity and returns `{ files, css }`:
+  - `src/server/routes/{pluralName}.mjs` -- Express route file with full CRUD, JSON flat file persistence, validation, standard error shapes.
+  - `src/public/js/services/{pluralName}-api.mjs` -- frontend API client.
+  - `src/public/js/components/{kebab}-card.mjs` -- list card (DOM element, clickable).
+  - `src/public/js/components/{kebab}-form.mjs` -- create/edit form with validation.
+  - `src/public/js/components/{kebab}-detail.mjs` -- detail view with edit/delete actions.
+  - CSS block returned as string (caller appends to `components.css`).
+- `scaffoldAll(entities, projectRoot)` -- scaffolds multiple entities and returns a registration snippet for `src/server/index.mjs`.
+
+Entity shape:
+```json
+{
+  "name": "Task",
+  "pluralName": "tasks",
+  "fields": [
+    { "name": "title", "type": "string", "required": true },
+    { "name": "status", "type": "enum", "options": ["open", "in-progress", "done"], "default": "open" }
+  ]
+}
+```
+
+Field types: `string`, `number`, `boolean`, `enum`, `date`, `id`, `reference`.
+
+Use when: a build spec introduces a new entity that needs CRUD. Run the scaffolder first, then customise the generated code.
+
+### `tools/utils/seed.mjs` -- Mock data generator
+
+Generates realistic records for any entity definition. Zero external deps. Curated word pools (no lorem ipsum).
+
+Key exports:
+- `generateRecords(entity, count)` -- returns an array of records with `id` (UUID), `createdAt` (ISO), and all entity fields populated with plausible data.
+- `seedToFile(entity, count, projectRoot)` -- writes records to `data/{pluralName}.json`.
+
+Smart field detection by name: `name`/`assignee` fields get person names, `email` gets emails, `title` gets project-style titles, `description` gets realistic sentences.
+
+Use when: seed data is needed for first-run demo state or testing.
+
+### Running utility tests
+
+```bash
+node --test 'tools/utils/tests/**/*.test.mjs'
+```
+
 ## What you are NOT
 
 - You are not a general-purpose chatbot. Stay focused on the RCF pipeline.
