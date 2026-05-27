@@ -184,6 +184,127 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  // --- API: Technical Architecture Report (print-ready HTML) ----------------
+  if (url.pathname === '/api/tech-report') {
+    try {
+      const data = await getProjectData();
+      const project = data.project || {};
+      const design = data.design || {};
+      const prd = data.prd || {};
+      const buildSpecs = data.buildSpecs || [];
+      const testSpecs = data.testSpecs || [];
+
+      const components = design.components || [];
+      const endpoints = design.endpoints || [];
+      const dataModel = design.dataModel || design.models || design.entities || [];
+      const models = Array.isArray(dataModel) ? dataModel : (design.dataModel ? [design.dataModel] : []);
+
+      const totalReqs = (prd.requirements || []).length;
+      const totalAc = (prd.requirements || []).reduce((sum, r) =>
+        sum + (r.stories || []).reduce((s2, st) => s2 + (st.acceptanceCriteria || []).length, 0), 0);
+      const verifiedBs = buildSpecs.filter(bs => bs.status === 'verified').length;
+      let passingTests = 0;
+      for (const ts of testSpecs) {
+        passingTests += (ts.testCases || []).filter(tc => tc.status === 'passing').length;
+      }
+
+      const esc = s => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${esc(project.name || 'Project')} - Technical Architecture</title>
+<style>
+  @media print { body { font-size: 11pt; } h1 { font-size: 18pt; } h2 { font-size: 14pt; break-before: avoid; } table { break-inside: avoid; } .no-print { display: none; } }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.6; }
+  h1 { border-bottom: 2px solid #1a2332; padding-bottom: 8px; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+  h2 { color: #1a2332; margin-top: 32px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th { text-align: left; padding: 6px 12px; background: #f5f5f5; border-bottom: 2px solid #ddd; font-weight: 600; }
+  td { padding: 6px 12px; border-bottom: 1px solid #eee; }
+  .method { font-weight: 700; font-size: 11px; }
+  .method-get { color: #22c55e; } .method-post { color: #00b4d8; } .method-put { color: #ed8936; } .method-delete { color: #ef4444; }
+  .path { font-family: monospace; color: #1a2332; }
+  .entity { background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px; padding: 12px; margin: 8px 0; }
+  .entity-name { font-weight: 700; color: #1a2332; margin-bottom: 6px; }
+  .field { display: inline-block; font-size: 12px; padding: 2px 8px; background: #e5e5e5; border-radius: 4px; margin: 2px; }
+  .stats { display: flex; gap: 24px; margin: 16px 0; }
+  .stat { text-align: center; }
+  .stat-val { font-size: 24px; font-weight: 700; color: #1a2332; }
+  .stat-lbl { font-size: 11px; color: #888; text-transform: uppercase; }
+  .print-btn { background: #1a2332; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 16px 0; }
+  .footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 11px; color: #999; }
+</style></head><body>
+<button class="print-btn no-print" onclick="window.print()">Save as PDF</button>
+<h1>${esc(project.name || 'Project')} - Technical Architecture</h1>
+<div class="subtitle">Generated ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} | Built on RCF Methodology</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-val">${totalReqs}</div><div class="stat-lbl">Requirements</div></div>
+  <div class="stat"><div class="stat-val">${totalAc}</div><div class="stat-lbl">Acceptance Criteria</div></div>
+  <div class="stat"><div class="stat-val">${verifiedBs}/${buildSpecs.length}</div><div class="stat-lbl">Specs Verified</div></div>
+  <div class="stat"><div class="stat-val">${passingTests}</div><div class="stat-lbl">Tests Passing</div></div>
+</div>
+
+${project.description ? `<p>${esc(project.description)}</p>` : ''}`;
+
+      // Components
+      if (components.length > 0) {
+        html += '<h2>Components</h2><table><thead><tr><th>Component</th><th>Description</th><th>Traces To</th></tr></thead><tbody>';
+        for (const c of components) {
+          html += `<tr><td><strong>${esc(c.name || '')}</strong></td><td>${esc(c.description || '')}</td><td>${esc((c.tracesTo || []).join(', '))}</td></tr>`;
+        }
+        html += '</tbody></table>';
+      }
+
+      // API Endpoints
+      if (endpoints.length > 0) {
+        html += '<h2>API Endpoints</h2><table><thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead><tbody>';
+        for (const ep of endpoints) {
+          const m = (ep.method || 'GET').toUpperCase();
+          html += `<tr><td class="method method-${m.toLowerCase()}">${m}</td><td class="path">${esc(ep.path || ep.route || '')}</td><td>${esc(ep.description || '')}</td></tr>`;
+        }
+        html += '</tbody></table>';
+      }
+
+      // Data Model
+      if (models.length > 0) {
+        html += '<h2>Data Model</h2>';
+        for (const model of models) {
+          const name = model.name || model.entity || 'Entity';
+          const fields = model.fields || model.properties || [];
+          html += `<div class="entity"><div class="entity-name">${esc(name)}</div><div>`;
+          if (Array.isArray(fields)) {
+            for (const f of fields) {
+              const label = typeof f === 'string' ? f : `${f.name || ''}${f.type ? ': ' + f.type : ''}`;
+              html += `<span class="field">${esc(label)}</span>`;
+            }
+          }
+          html += '</div></div>';
+        }
+      }
+
+      // Requirements summary
+      if (prd.requirements && prd.requirements.length > 0) {
+        html += '<h2>Requirements</h2><table><thead><tr><th>ID</th><th>Requirement</th><th>Stories</th><th>ACs</th></tr></thead><tbody>';
+        for (const req of prd.requirements) {
+          const stories = (req.stories || []).length;
+          const acs = (req.stories || []).reduce((s, st) => s + (st.acceptanceCriteria || []).length, 0);
+          html += `<tr><td><strong>${esc(req.id)}</strong></td><td>${esc(req.title || '')}</td><td>${stories}</td><td>${acs}</td></tr>`;
+        }
+        html += '</tbody></table>';
+      }
+
+      html += `<div class="footer">Built on RCF Methodology | ${esc(project.name || 'Project')} | ${new Date().toISOString().slice(0, 10)}</div></body></html>`;
+
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end(`Error generating report: ${err.message}`);
+    }
+    return;
+  }
+
   // --- API: SSE events -----------------------------------------------------
   if (url.pathname === '/api/events') {
     res.writeHead(200, {

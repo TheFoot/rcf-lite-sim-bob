@@ -788,6 +788,118 @@
     }
 
     /* ---------------------------------------------------------------
+       Tech Section Tabs
+       --------------------------------------------------------------- */
+    .tech-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tech-tab {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      padding: var(--space-sm) var(--space-lg);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color var(--transition), border-color var(--transition);
+    }
+
+    .tech-tab:hover {
+      color: var(--color-text);
+    }
+
+    .tech-tab.active {
+      color: var(--color-accent);
+      border-bottom-color: var(--color-accent);
+    }
+
+    .tech-tab-panel {
+      display: none;
+    }
+
+    .tech-tab-panel.active {
+      display: block;
+    }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+
+    .tech-table th {
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      color: var(--color-text-muted);
+      font-weight: 600;
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .tech-table td {
+      padding: var(--space-sm) var(--space-md);
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .tech-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tech-table .method {
+      font-weight: 600;
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      min-width: 50px;
+    }
+
+    .tech-table .method-get { color: var(--phase-verified); }
+    .tech-table .method-post { color: var(--color-accent); }
+    .tech-table .method-put { color: var(--phase-building); }
+    .tech-table .method-delete { color: var(--test-failing); }
+
+    .tech-table .path {
+      font-family: monospace;
+      color: var(--color-accent);
+      font-size: var(--font-size-sm);
+    }
+
+    .tech-entity {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .tech-entity-name {
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-bottom: var(--space-sm);
+    }
+
+    .tech-entity-fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .tech-field {
+      font-size: var(--font-size-xs);
+      padding: 2px var(--space-sm);
+      background: var(--color-secondary);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* ---------------------------------------------------------------
        View Toggle
        --------------------------------------------------------------- */
     .view-toggle {
@@ -1114,6 +1226,18 @@
         <div id="buildSpecsContent"></div>
       </section>
 
+      <!-- Section 2b: Technical Design (collapsible) -->
+      <section class="section" id="sectionTech">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border);">
+          <h2 style="font-size: var(--font-size-lg); font-weight: 600; color: var(--color-text); margin: 0; cursor: pointer;" onclick="toggleTechSection()">
+            <span id="techToggleIcon" style="display: inline-block; transition: transform 150ms; transform: rotate(0deg); margin-right: var(--space-xs);">&#9654;</span>
+            Technical Design
+          </h2>
+          <a id="techReportLink" href="/api/tech-report" target="_blank" rel="noopener" style="display: none; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-md); background: var(--color-secondary); color: var(--color-text); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-weight: 600; text-decoration: none; white-space: nowrap;">Export PDF &#8599;</a>
+        </div>
+        <div id="techContent" style="display: none;"></div>
+      </section>
+
       <!-- Section 3: Traceability Matrix -->
       <section class="section" id="sectionTrace">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border);">
@@ -1227,6 +1351,7 @@
       renderOverview();
       renderPipeline();
       renderBuildSpecs();
+      renderTechDesign();
       renderTrace();
       if (traceView === 'graph') renderFlowGraph();
       renderCoverage();
@@ -1474,6 +1599,128 @@
           </div>`;
       }
       html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // --- Technical Design ------------------------------------------------
+
+    let techOpen = false;
+    let techTab = 'stack';
+
+    window.toggleTechSection = function() {
+      techOpen = !techOpen;
+      document.getElementById('techContent').style.display = techOpen ? '' : 'none';
+      document.getElementById('techToggleIcon').style.transform = techOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+      document.getElementById('techReportLink').style.display = techOpen ? 'inline-flex' : 'none';
+    };
+
+    window.setTechTab = function(tab) {
+      techTab = tab;
+      document.querySelectorAll('.tech-tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+      document.querySelectorAll('.tech-tab-panel').forEach(el => el.classList.toggle('active', el.id === `tech-${tab}`));
+    };
+
+    function renderTechDesign() {
+      const container = document.getElementById('techContent');
+      const { design, prd, buildSpecs } = projectData;
+
+      if (!design) {
+        container.innerHTML = renderEmptyState('No technical design yet.', 'Run <code>/design</code> to generate the architecture.');
+        return;
+      }
+
+      const components = design.components || [];
+      const endpoints = design.endpoints || [];
+      const dataModel = design.dataModel || design.models || design.entities || [];
+
+      // Tabs
+      let html = '<div class="tech-tabs">';
+      html += `<button class="tech-tab ${techTab === 'stack' ? 'active' : ''}" data-tab="stack" onclick="setTechTab('stack')">Tech Stack</button>`;
+      html += `<button class="tech-tab ${techTab === 'components' ? 'active' : ''}" data-tab="components" onclick="setTechTab('components')">Components</button>`;
+      if (endpoints.length > 0) {
+        html += `<button class="tech-tab ${techTab === 'api' ? 'active' : ''}" data-tab="api" onclick="setTechTab('api')">API Endpoints</button>`;
+      }
+      if (dataModel.length > 0 || design.dataModel) {
+        html += `<button class="tech-tab ${techTab === 'data' ? 'active' : ''}" data-tab="data" onclick="setTechTab('data')">Data Model</button>`;
+      }
+      html += '</div>';
+
+      // Tab: Tech Stack
+      html += `<div class="tech-tab-panel ${techTab === 'stack' ? 'active' : ''}" id="tech-stack">`;
+      const stackItems = design.techStack || design.stack || [];
+      if (Array.isArray(stackItems) && stackItems.length > 0) {
+        html += '<table class="tech-table"><thead><tr><th>Technology</th><th>Purpose</th></tr></thead><tbody>';
+        for (const item of stackItems) {
+          if (typeof item === 'string') {
+            html += `<tr><td>${esc(item)}</td><td></td></tr>`;
+          } else {
+            html += `<tr><td>${esc(item.name || item.technology || '')}</td><td style="color: var(--color-text-muted);">${esc(item.purpose || item.description || '')}</td></tr>`;
+          }
+        }
+        html += '</tbody></table>';
+      } else {
+        // Fallback: extract from standards references
+        html += '<div style="color: var(--color-text-muted); font-size: var(--font-size-sm); padding: var(--space-md);">Tech stack is defined in the <code>standards/</code> directory: Node.js, Express.js, vanilla JS SPA.</div>';
+      }
+      html += '</div>';
+
+      // Tab: Components
+      html += `<div class="tech-tab-panel ${techTab === 'components' ? 'active' : ''}" id="tech-components">`;
+      if (components.length > 0) {
+        html += '<table class="tech-table"><thead><tr><th>Component</th><th>Description</th><th>Traces To</th></tr></thead><tbody>';
+        for (const c of components) {
+          const traces = (c.tracesTo || []).join(', ');
+          html += `<tr>
+            <td style="font-weight: 500;">${esc(c.name || c.id || '')}</td>
+            <td style="color: var(--color-text-muted);">${esc(c.description || '')}</td>
+            <td><span style="color: var(--color-accent); font-size: var(--font-size-xs);">${esc(traces)}</span></td>
+          </tr>`;
+        }
+        html += '</tbody></table>';
+      } else {
+        html += renderEmptyState('No components defined.', '');
+      }
+      html += '</div>';
+
+      // Tab: API Endpoints
+      if (endpoints.length > 0) {
+        html += `<div class="tech-tab-panel ${techTab === 'api' ? 'active' : ''}" id="tech-api">`;
+        html += '<table class="tech-table"><thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead><tbody>';
+        for (const ep of endpoints) {
+          const method = (ep.method || 'GET').toUpperCase();
+          const methodCls = `method method-${method.toLowerCase()}`;
+          html += `<tr>
+            <td class="${methodCls}">${method}</td>
+            <td class="path">${esc(ep.path || ep.route || '')}</td>
+            <td style="color: var(--color-text-muted);">${esc(ep.description || '')}</td>
+          </tr>`;
+        }
+        html += '</tbody></table>';
+        html += '</div>';
+      }
+
+      // Tab: Data Model
+      if (dataModel.length > 0 || design.dataModel) {
+        html += `<div class="tech-tab-panel ${techTab === 'data' ? 'active' : ''}" id="tech-data">`;
+        const models = Array.isArray(dataModel) ? dataModel : (design.dataModel ? [design.dataModel] : []);
+        for (const model of models) {
+          const name = model.name || model.entity || 'Entity';
+          const fields = model.fields || model.properties || Object.keys(model).filter(k => !['name','entity','id'].includes(k));
+          html += `<div class="tech-entity">
+            <div class="tech-entity-name">${esc(name)}</div>
+            <div class="tech-entity-fields">`;
+          if (Array.isArray(fields)) {
+            for (const f of fields) {
+              const label = typeof f === 'string' ? f : `${f.name || f.field || ''}${f.type ? ': ' + f.type : ''}`;
+              const required = (typeof f === 'object' && f.required) ? ' style="border: 1px solid var(--color-accent);"' : '';
+              html += `<span class="tech-field"${required}>${esc(label)}</span>`;
+            }
+          }
+          html += '</div></div>';
+        }
+        html += '</div>';
+      }
+
       container.innerHTML = html;
     }
 
