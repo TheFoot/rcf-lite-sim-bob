@@ -1,0 +1,148 @@
+{
+  "name": "Meeting Notes",
+  "description": "A local-first web application for capturing, organizing, and tracking action items from team meetings. Designed for teams who want a simple, fast way to record meeting outcomes and follow up on action items.",
+  "created": "2026-05-27T10:05:00.000Z",
+  "updated": "2026-05-27T10:05:00.000Z",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "Meeting Management",
+      "description": "Users can create, view, edit, and delete meetings. Each meeting has a title, date, attendees, and notes content.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-001",
+          "title": "Meeting CRUD",
+          "asA": "team member",
+          "iWant": "to create, view, edit, and delete meetings",
+          "soThat": "I can keep a record of all team meetings",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-001-01",
+              "given": "I am on the meetings list page",
+              "when": "I click 'New Meeting'",
+              "then": "a form appears where I can enter meeting title, date, attendees, and notes"
+            },
+            {
+              "id": "AC-001-02",
+              "given": "I have created meetings",
+              "when": "I visit the meetings list page",
+              "then": "I see all meetings listed with title, date, and attendee count"
+            },
+            {
+              "id": "AC-001-03",
+              "given": "I am viewing a meeting",
+              "when": "I click Edit",
+              "then": "I can modify all fields and save the changes"
+            },
+            {
+              "id": "AC-001-04",
+              "given": "I am viewing a meeting",
+              "when": "I click Delete and confirm",
+              "then": "the meeting is removed and I return to the meetings list"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "title": "Action Item Tracking",
+      "description": "Each meeting can have action items assigned to team members with due dates and status tracking.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-002",
+          "title": "Action Item CRUD",
+          "asA": "team member",
+          "iWant": "to create, view, update, and delete action items linked to meetings",
+          "soThat": "I can track follow-up tasks and their completion status",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-002-01",
+              "given": "I am viewing a meeting",
+              "when": "I click 'Add Action Item'",
+              "then": "a form appears where I can enter a title, assignee, due date, and status"
+            },
+            {
+              "id": "AC-002-02",
+              "given": "a meeting has action items",
+              "when": "I view the meeting detail",
+              "then": "I see all action items listed with title, assignee, due date, and status badge"
+            },
+            {
+              "id": "AC-002-03",
+              "given": "I am viewing an action item",
+              "when": "I change its status",
+              "then": "the status updates immediately and the badge reflects the new state"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "title": "Dashboard Overview",
+      "description": "A landing page that shows a summary of recent meetings, upcoming action items, and overall team activity.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-003",
+          "title": "Dashboard Summary",
+          "asA": "team lead",
+          "iWant": "to see a dashboard with meeting statistics and upcoming action items",
+          "soThat": "I get a quick overview of team meeting activity and outstanding tasks",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-003-01",
+              "given": "I open the app",
+              "when": "the dashboard loads",
+              "then": "I see the app name, description, and summary stats (total meetings, total action items, overdue items)"
+            },
+            {
+              "id": "AC-003-02",
+              "given": "there are meetings in the system",
+              "when": "I view the dashboard",
+              "then": "I see the 5 most recent meetings with links to their detail pages"
+            },
+            {
+              "id": "AC-003-03",
+              "given": "there are action items with upcoming due dates",
+              "when": "I view the dashboard",
+              "then": "I see upcoming and overdue action items highlighted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "title": "Search and Filtering",
+      "description": "Users can search meetings by title or content, and filter action items by status or assignee.",
+      "priority": "should",
+      "stories": [
+        {
+          "id": "US-004",
+          "title": "Search and Filter",
+          "asA": "team member",
+          "iWant": "to search meetings and filter action items",
+          "soThat": "I can quickly find specific meetings or outstanding tasks",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-004-01",
+              "given": "I am on the meetings list page",
+              "when": "I type in the search box",
+              "then": "the list filters to show only meetings matching the search term in title or notes"
+            },
+            {
+              "id": "AC-004-02",
+              "given": "I am viewing action items",
+              "when": "I select a status filter",
+              "then": "only action items with that status are displayed"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
