@@ -1,12 +1,31 @@
-# /build -- Execute a build spec through the 5-stage cycle
+# /build -- Execute build specs through the 5-stage cycle
 
-Takes a build spec ID as argument (e.g., `/build BS-001`). Runs the full RCF 5-stage build cycle for that spec.
+Takes a build spec ID (e.g., `/build BS-001`) or builds all remaining specs when asked ("build all", "run all specs", "complete all build specs").
+
+## Single spec
+
+Standard mode. Dispatches ONE spec to a subagent for the 5-stage cycle.
+
+## All specs
+
+When the user asks to build all specs:
+
+1. Read all build specs, sort by `order`, filter to non-verified
+2. Execute SEQUENTIALLY via subagent dispatch -- one spec at a time, in dependency order
+3. After each spec completes, report progress ("BS-001 complete. Starting BS-002...")
+4. After all specs, regenerate trace.json and run validation
+
+**Always dispatch to a subagent when the Agent tool is available.** The main thread stays free for the user.
 
 ## Prerequisites
 
 - `rcf/build-specs/BS-NNN.json` must exist and have status "ready" or "defined"
 - If the spec has dependencies, all dependencies must have status "verified"
-- If no ID is given, check which build spec is next in order and confirm with the user
+- If no ID is given and only one spec remains, start it. If multiple remain, confirm with the user or build all in order.
+
+## Status updates (critical for dashboard)
+
+Update `rcf/build-specs/BS-NNN.json` status at EVERY stage transition: `ready` -> `defining` -> `building` -> `reviewing` -> `testing` -> `verified`. Each write triggers the dashboard to update via SSE. Do NOT batch updates to the end.
 
 ## The 5-stage cycle
 

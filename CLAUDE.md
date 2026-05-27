@@ -159,7 +159,7 @@ The CLAUDE.md, standards, and current RCF docs consume context. Be mindful:
 
 ### Subagent dispatch for builds
 
-When executing `/build BS-NNN`:
+**Single spec** (`/build BS-001`):
 
 1. Read the build spec from `rcf/build-specs/BS-NNN.json`
 2. If the Agent tool is available, dispatch a worker with:
@@ -168,8 +168,33 @@ When executing `/build BS-NNN`:
    - The relevant design section
    - Instructions to execute all 5 stages
    - The project root path
+   - Explicit instruction: "Update the build spec JSON status at EACH stage transition (defining, building, reviewing, testing, verified). Update rcf/project.json stats after finalise. The dashboard reads these files live."
 3. If the Agent tool is not available (or the user prefers), execute the 5-stage cycle directly in the main session
-4. After completion, update the build spec status and trace.json
+4. After completion, verify the build spec status and trace.json are updated
+
+**All specs** (when the user asks to "build all", "run all specs", "complete all build specs", etc.):
+
+1. Read all build specs and sort by `order` field (lowest first)
+2. Filter to specs that are NOT already `verified`
+3. Execute them SEQUENTIALLY -- one at a time, in order. Respect dependencies.
+4. For EACH spec, dispatch a subagent via the Agent tool:
+   - The subagent runs the full 5-stage cycle for that ONE spec
+   - Include in the dispatch: the build spec JSON, all standards docs, design context, and the instruction to update status at each stage transition
+   - Wait for the subagent to complete before starting the next spec
+5. After EACH spec completes, update the main session's view: report progress to the user ("BS-001 complete. Starting BS-002...")
+6. After ALL specs complete, regenerate `rcf/trace.json` and run `npm run rcf -- validate`
+
+**NEVER run build specs in the main thread when the Agent tool is available.** The main thread stays clean for user interaction. If the user is watching, they should see progress updates between specs while the dashboard updates in real time.
+
+### Real-time status updates during builds
+
+The dashboard reads `rcf/` files via SSE file watcher. For the dashboard to show live progress:
+
+- Update `rcf/build-specs/BS-NNN.json` status at EVERY stage transition: `ready` -> `defining` -> `building` -> `reviewing` -> `testing` -> `verified`
+- Update `rcf/project.json` stats after each spec completes (increment `buildSpecsVerified`, update `testsPassing`/`testsTotal`)
+- These writes trigger the SSE watcher, so the dashboard pipeline board and build progress section update automatically
+
+Do NOT batch status updates to the end of the build. Each stage transition is a write.
 
 ### Context break points
 
