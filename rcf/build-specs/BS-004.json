@@ -4,12 +4,21 @@
   "description": "Add search functionality to the meetings list page and status/assignee filtering to action items. Search and filtering are client-side for instant results.",
   "requirement": "REQ-004",
   "story": "US-004",
-  "acceptanceCriteria": ["AC-004-01", "AC-004-02"],
+  "acceptanceCriteria": [
+    "AC-004-01",
+    "AC-004-02"
+  ],
   "designContext": "Client-side text search on meetings list page filters by title and notes content. Action items filtering by status dropdown and assignee text. Both operate on already-fetched data without additional API calls.",
-  "standards": ["spa-patterns"],
-  "dependencies": ["BS-001", "BS-002"],
-  "status": "ready",
+  "standards": [
+    "spa-patterns"
+  ],
+  "dependencies": [
+    "BS-001",
+    "BS-002"
+  ],
+  "status": "defining",
   "order": 4,
   "created": "2026-05-27T10:20:00.000Z",
-  "updated": "2026-05-27T10:20:00.000Z"
+  "updated": "2026-05-27T10:20:00.000Z",
+  "startedAt": "2026-05-27T13:00:00.000Z"
 }
