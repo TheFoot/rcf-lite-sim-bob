@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-27T10:24:00.000Z",
+  "generated": "2026-05-27T10:30:00.000Z",
   "chains": [
     {
       "requirement": { "id": "REQ-001", "title": "Project Management" },
@@ -70,13 +70,36 @@
         }
       ]
     }
+    ,
+    {
+      "requirement": { "id": "REQ-005", "title": "Document Assembly and Export" },
+      "stories": [
+        {
+          "id": "US-006",
+          "title": "Preview assembled document",
+          "acceptanceCriteria": [
+            { "id": "AC-006-01", "buildSpec": { "id": "BS-005", "status": "verified" }, "testSpec": { "id": "TS-005", "status": "passed", "testCount": 2, "passingCount": 2 } },
+            { "id": "AC-006-02", "buildSpec": { "id": "BS-005", "status": "verified" }, "testSpec": { "id": "TS-005", "status": "passed", "testCount": 1, "passingCount": 1 } },
+            { "id": "AC-006-03", "buildSpec": { "id": "BS-005", "status": "verified" }, "testSpec": { "id": "TS-005", "status": "passed", "testCount": 1, "passingCount": 1 } }
+          ]
+        },
+        {
+          "id": "US-007",
+          "title": "Export document as PDF and DOCX",
+          "acceptanceCriteria": [
+            { "id": "AC-007-01", "buildSpec": { "id": "BS-005", "status": "verified" }, "testSpec": { "id": "TS-005", "status": "passed", "testCount": 1, "passingCount": 1 } },
+            { "id": "AC-007-02", "buildSpec": { "id": "BS-005", "status": "verified" }, "testSpec": { "id": "TS-005", "status": "passed", "testCount": 1, "passingCount": 1 } }
+          ]
+        }
+      ]
+    }
   ],
   "summary": {
-    "totalRequirements": 4,
-    "totalAcceptanceCriteria": 15,
-    "coveredAcceptanceCriteria": 15,
-    "totalTests": 31,
-    "passingTests": 31,
+    "totalRequirements": 5,
+    "totalAcceptanceCriteria": 20,
+    "coveredAcceptanceCriteria": 20,
+    "totalTests": 37,
+    "passingTests": 37,
     "coveragePercent": 100
   }
 }

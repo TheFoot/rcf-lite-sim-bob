@@ -1,14 +1,1 @@
-[
-  {
-    "id": "59bde874-e6cb-4140-bfbe-28ab3dfe8acd",
-    "projectId": "ea4643c7-5269-4380-89ed-6526001c870f",
-    "templateId": "788c6225-58fa-411c-952d-cf84adf5b193",
-    "name": "Test Template",
-    "content": "## Risk Factors\n\nTest content.",
-    "status": "draft",
-    "approvedBy": null,
-    "approvedAt": null,
-    "order": 1,
-    "createdAt": "2026-05-27T14:19:08.764Z"
-  }
-]
+[{"id":"export-sec-1","projectId":"export-proj-1","templateId":"export-tmpl-1","name":"Risk Factors","content":"## Risk Factors\n\nKey risks include market volatility and regulatory changes.","status":"approved","approvedBy":"Alice","approvedAt":"2026-05-20T10:00:00.000Z","order":1,"createdAt":"2026-03-01T00:00:00.000Z"},{"id":"export-sec-2","projectId":"export-proj-1","templateId":"export-tmpl-1","name":"Financial Summary","content":"## Financial Summary\n\n| Metric | Value |\n|--------|-------|\n| Revenue | $125M |\n| Profit | $24M |","status":"locked","approvedBy":"Bob","approvedAt":"2026-05-18T14:00:00.000Z","order":2,"createdAt":"2026-03-02T00:00:00.000Z"},{"id":"export-sec-3","projectId":"export-proj-1","templateId":"export-tmpl-1","name":"Draft Section","content":"## Draft\n\nNot ready.","status":"draft","approvedBy":null,"approvedAt":null,"order":3,"createdAt":"2026-03-03T00:00:00.000Z"}]

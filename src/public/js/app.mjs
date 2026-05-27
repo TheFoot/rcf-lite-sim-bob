@@ -145,6 +145,31 @@ registerRoute('/projects/:id', async (container, params) => {
     });
     section.append(detail);
 
+    // Document assembly panel
+    const assemblyPanel = document.createElement('div');
+    assemblyPanel.style.display = 'flex';
+    assemblyPanel.style.gap = 'var(--space-md)';
+    assemblyPanel.style.marginTop = 'var(--space-lg)';
+
+    const previewBtn = document.createElement('a');
+    previewBtn.href = `/projects/${project.id}/preview`;
+    previewBtn.setAttribute('data-link', '');
+    previewBtn.className = 'btn btn-primary';
+    previewBtn.textContent = 'Preview Document';
+
+    const exportPdfBtn = document.createElement('a');
+    exportPdfBtn.href = `/api/v1/projects/${project.id}/export/pdf`;
+    exportPdfBtn.className = 'btn btn-secondary';
+    exportPdfBtn.textContent = 'Export PDF';
+
+    const exportDocxBtn = document.createElement('a');
+    exportDocxBtn.href = `/api/v1/projects/${project.id}/export/docx`;
+    exportDocxBtn.className = 'btn btn-secondary';
+    exportDocxBtn.textContent = 'Export DOCX';
+
+    assemblyPanel.append(previewBtn, exportPdfBtn, exportDocxBtn);
+    section.append(assemblyPanel);
+
     // Sections panel
     const sectionsPanel = document.createElement('section');
     sectionsPanel.className = 'card';
@@ -223,6 +248,83 @@ registerRoute('/projects/:id/edit', async (container, params) => {
     section.append(form);
   } catch (err) {
     section.innerHTML = `<p style="color: var(--color-error);">Project not found: ${err.message}</p>`;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Route: Document preview (/projects/:id/preview)
+// ---------------------------------------------------------------------------
+
+registerRoute('/projects/:id/preview', async (container, params) => {
+  const card = document.createElement('section');
+  card.className = 'card';
+  card.innerHTML = '<h2>Assembling Document...</h2><p class="text-muted">Collecting approved sections...</p>';
+  container.append(card);
+
+  try {
+    const res = await fetch(`/api/v1/projects/${params.id}/assemble`);
+    if (!res.ok) throw new Error(`Assembly failed: ${res.status}`);
+    const data = await res.json();
+
+    card.innerHTML = '';
+
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = 'var(--space-lg)';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Document Preview';
+
+    const actions = document.createElement('div');
+    actions.style.display = 'flex';
+    actions.style.gap = 'var(--space-sm)';
+
+    const pdfBtn = document.createElement('a');
+    pdfBtn.href = `/api/v1/projects/${params.id}/export/pdf`;
+    pdfBtn.className = 'btn btn-primary';
+    pdfBtn.textContent = 'Download PDF';
+
+    const docxBtn = document.createElement('a');
+    docxBtn.href = `/api/v1/projects/${params.id}/export/docx`;
+    docxBtn.className = 'btn btn-secondary';
+    docxBtn.textContent = 'Download DOCX';
+
+    const backBtn = document.createElement('a');
+    backBtn.href = `/projects/${params.id}`;
+    backBtn.setAttribute('data-link', '');
+    backBtn.className = 'btn btn-secondary';
+    backBtn.textContent = 'Back to Project';
+
+    actions.append(pdfBtn, docxBtn, backBtn);
+    header.append(heading, actions);
+    card.append(header);
+
+    const info = document.createElement('p');
+    info.className = 'text-muted';
+    info.textContent = `${data.sectionCount} section${data.sectionCount !== 1 ? 's' : ''} assembled.`;
+    card.append(info);
+
+    // Render the assembled HTML in an iframe for proper isolation
+    const frame = document.createElement('iframe');
+    frame.className = 'document-preview-frame';
+    frame.style.width = '100%';
+    frame.style.minHeight = '600px';
+    frame.style.border = '1px solid var(--color-border)';
+    frame.style.borderRadius = 'var(--radius)';
+    frame.style.background = '#fff';
+    card.append(frame);
+
+    // Write HTML to iframe after it's in the DOM
+    setTimeout(() => {
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      doc.open();
+      doc.write(data.html);
+      doc.close();
+    }, 0);
+  } catch (err) {
+    card.innerHTML = `<h2>Document Preview</h2><p style="color: var(--color-error);">Failed to assemble document: ${err.message}</p>`;
   }
 });
 

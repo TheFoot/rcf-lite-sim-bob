@@ -8,6 +8,7 @@ import { registerProjectRoutes } from './routes/projects.mjs';
 import { registerTemplateRoutes } from './routes/templates.mjs';
 import { registerSectionRoutes } from './routes/sections.mjs';
 import { registerDashboardRoutes } from './routes/dashboard.mjs';
+import { registerExportRoutes } from './routes/export.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -75,6 +76,7 @@ registerProjectRoutes(apiRouter);
 registerTemplateRoutes(apiRouter);
 registerSectionRoutes(apiRouter);
 registerDashboardRoutes(apiRouter);
+registerExportRoutes(apiRouter);
 
 app.use('/api/v1', apiRouter);
 

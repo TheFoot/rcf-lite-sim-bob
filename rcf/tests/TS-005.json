@@ -1,0 +1,17 @@
+{
+  "id": "TS-005",
+  "buildSpec": "BS-005",
+  "acceptanceCriteria": ["AC-006-01", "AC-006-02", "AC-006-03", "AC-007-01", "AC-007-02"],
+  "testCases": [
+    { "id": "TC-005-01", "description": "GET /api/v1/projects/:id/assemble returns assembled HTML with all approved sections", "verifiesAc": "AC-006-01", "status": "passing" },
+    { "id": "TC-005-02", "description": "Assembled document includes table of contents and section numbering", "verifiesAc": "AC-006-02", "status": "passing" },
+    { "id": "TC-005-03", "description": "Assembled document renders markdown as HTML", "verifiesAc": "AC-006-03", "status": "passing" },
+    { "id": "TC-005-04", "description": "GET /api/v1/projects/:id/export/pdf returns a PDF buffer", "verifiesAc": "AC-007-01", "status": "passing" },
+    { "id": "TC-005-05", "description": "GET /api/v1/projects/:id/export/docx returns a DOCX buffer", "verifiesAc": "AC-007-02", "status": "passing" },
+    { "id": "TC-005-06", "description": "Assembly endpoint returns 404 for non-existent project", "verifiesAc": "AC-006-01", "status": "passing" }
+  ],
+  "testFile": "src/tests/export.test.mjs",
+  "status": "passed",
+  "created": "2026-05-27T10:26:00.000Z",
+  "updated": "2026-05-27T10:30:00.000Z"
+}
