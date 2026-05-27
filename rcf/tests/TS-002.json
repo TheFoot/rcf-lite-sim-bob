@@ -1,47 +1,51 @@
 {
   "id": "TS-002",
   "buildSpec": "BS-002",
-  "acceptanceCriteria": ["AC-002-01", "AC-002-02", "AC-002-03"],
+  "acceptanceCriteria": [
+    "AC-002-01",
+    "AC-002-02",
+    "AC-002-03"
+  ],
   "testCases": [
     {
       "id": "TC-002-01",
       "description": "POST /api/v1/action-items creates an action item linked to a meeting",
       "verifiesAc": "AC-002-01",
-      "status": "pending"
+      "status": "passing"
     },
     {
       "id": "TC-002-02",
       "description": "POST /api/v1/action-items returns 400 when title or meetingId is missing",
       "verifiesAc": "AC-002-01",
-      "status": "pending"
+      "status": "passing"
     },
     {
       "id": "TC-002-03",
       "description": "GET /api/v1/action-items?meetingId=X returns only items for that meeting",
       "verifiesAc": "AC-002-02",
-      "status": "pending"
+      "status": "passing"
     },
     {
       "id": "TC-002-04",
       "description": "GET /api/v1/action-items/:id returns a single action item with all fields",
       "verifiesAc": "AC-002-02",
-      "status": "pending"
+      "status": "passing"
     },
     {
       "id": "TC-002-05",
       "description": "PUT /api/v1/action-items/:id updates status and other fields",
       "verifiesAc": "AC-002-03",
-      "status": "pending"
+      "status": "passing"
     },
     {
       "id": "TC-002-06",
       "description": "DELETE /api/v1/action-items/:id removes the action item",
       "verifiesAc": "AC-002-03",
-      "status": "pending"
+      "status": "passing"
     }
   ],
   "testFile": "src/tests/action-items.test.mjs",
-  "status": "defined",
+  "status": "passed",
   "created": "2026-05-27T11:00:00.000Z",
-  "updated": "2026-05-27T11:00:00.000Z"
+  "updated": "2026-05-27T11:30:00.000Z"
 }
