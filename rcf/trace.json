@@ -1,0 +1,82 @@
+{
+  "generated": "2026-05-27T10:07:00.000Z",
+  "chains": [
+    {
+      "requirement": { "id": "REQ-001", "title": "Project Management" },
+      "stories": [
+        {
+          "id": "US-001",
+          "title": "Manage document projects",
+          "acceptanceCriteria": [
+            { "id": "AC-001-01", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 2, "passingCount": 2 } },
+            { "id": "AC-001-02", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 3, "passingCount": 3 } },
+            { "id": "AC-001-03", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 1, "passingCount": 1 } },
+            { "id": "AC-001-04", "buildSpec": { "id": "BS-001", "status": "verified" }, "testSpec": { "id": "TS-001", "status": "passed", "testCount": 2, "passingCount": 2 } }
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": { "id": "REQ-002", "title": "Section Library" },
+      "stories": [
+        {
+          "id": "US-002",
+          "title": "Manage section templates",
+          "acceptanceCriteria": [
+            { "id": "AC-002-01" },
+            { "id": "AC-002-02" },
+            { "id": "AC-002-03" },
+            { "id": "AC-002-04" }
+          ]
+        },
+        {
+          "id": "US-003",
+          "title": "Add sections to projects",
+          "acceptanceCriteria": [
+            { "id": "AC-003-01" },
+            { "id": "AC-003-02" },
+            { "id": "AC-003-03" }
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": { "id": "REQ-003", "title": "Section Workflow" },
+      "stories": [
+        {
+          "id": "US-004",
+          "title": "Track section approval workflow",
+          "acceptanceCriteria": [
+            { "id": "AC-004-01" },
+            { "id": "AC-004-02" },
+            { "id": "AC-004-03" },
+            { "id": "AC-004-04" }
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": { "id": "REQ-004", "title": "Dashboard" },
+      "stories": [
+        {
+          "id": "US-005",
+          "title": "View project dashboard",
+          "acceptanceCriteria": [
+            { "id": "AC-005-01" },
+            { "id": "AC-005-02" },
+            { "id": "AC-005-03" },
+            { "id": "AC-005-04" }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalRequirements": 4,
+    "totalAcceptanceCriteria": 15,
+    "coveredAcceptanceCriteria": 4,
+    "totalTests": 8,
+    "passingTests": 8,
+    "coveragePercent": 26.7
+  }
+}

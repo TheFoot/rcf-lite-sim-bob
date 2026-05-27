@@ -244,3 +244,78 @@ main {
 .site-footer p {
   font-size: var(--font-size-sm);
 }
+
+/* ==========================================================================
+   Navigation
+   ========================================================================== */
+
+.site-nav {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.nav-link {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius);
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+  background-color: rgba(0, 180, 216, 0.1);
+}
+
+.nav-link.is-active {
+  color: var(--color-accent);
+}
+
+/* ==========================================================================
+   Form Elements
+   ========================================================================== */
+
+input, select, textarea {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* ==========================================================================
+   Badge
+   ========================================================================== */
+
+.badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge--active { background: rgba(0, 180, 216, 0.2); color: var(--color-accent); }
+.badge--completed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.badge--archived { background: rgba(160, 174, 192, 0.2); color: var(--color-text-muted); }
+.badge--draft { background: rgba(160, 174, 192, 0.2); color: var(--color-text-muted); }
+.badge--in-review { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.badge--approved { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.badge--locked { background: rgba(239, 68, 68, 0.2); color: #ef4444; }

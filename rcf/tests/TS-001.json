@@ -1,0 +1,19 @@
+{
+  "id": "TS-001",
+  "buildSpec": "BS-001",
+  "acceptanceCriteria": ["AC-001-01", "AC-001-02", "AC-001-03", "AC-001-04"],
+  "testCases": [
+    { "id": "TC-001-01", "description": "POST /api/v1/projects creates a new project and returns 201", "verifiesAc": "AC-001-01", "status": "passing" },
+    { "id": "TC-001-02", "description": "POST /api/v1/projects with missing name returns 400 validation error", "verifiesAc": "AC-001-01", "status": "passing" },
+    { "id": "TC-001-03", "description": "GET /api/v1/projects returns list of all projects", "verifiesAc": "AC-001-02", "status": "passing" },
+    { "id": "TC-001-04", "description": "GET /api/v1/projects/:id returns a single project with all fields", "verifiesAc": "AC-001-02", "status": "passing" },
+    { "id": "TC-001-05", "description": "GET /api/v1/projects/:id with invalid id returns 404", "verifiesAc": "AC-001-02", "status": "passing" },
+    { "id": "TC-001-06", "description": "PUT /api/v1/projects/:id updates project fields and returns updated record", "verifiesAc": "AC-001-03", "status": "passing" },
+    { "id": "TC-001-07", "description": "DELETE /api/v1/projects/:id removes the project and returns 204", "verifiesAc": "AC-001-04", "status": "passing" },
+    { "id": "TC-001-08", "description": "DELETE /api/v1/projects/:id with invalid id returns 404", "verifiesAc": "AC-001-04", "status": "passing" }
+  ],
+  "testFile": "src/tests/projects.test.mjs",
+  "status": "passed",
+  "created": "2026-05-27T10:03:00.000Z",
+  "updated": "2026-05-27T10:07:00.000Z"
+}
