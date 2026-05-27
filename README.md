@@ -2,6 +2,8 @@
 
 Build traceable, standards-compliant products with AI. Requirements, design, implementation, and testing - all linked, all tracked.
 
+Full methodology documentation: [stravica.ai/rcf-methodology](https://stravica.ai/rcf-methodology/)
+
 ## Quick start
 
 ```bash
