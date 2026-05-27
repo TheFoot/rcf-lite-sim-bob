@@ -3,6 +3,11 @@ import { fetchProjects, fetchProject, createProject, updateProject, deleteProjec
 import { createProjectCard } from './components/project-card.mjs';
 import { createProjectForm } from './components/project-form.mjs';
 import { createProjectDetail } from './components/project-detail.mjs';
+import { fetchTemplates, fetchTemplate, createTemplate, updateTemplate, deleteTemplate } from './services/templates-api.mjs';
+import { createTemplateCard } from './components/template-card.mjs';
+import { createTemplateForm } from './components/template-form.mjs';
+import { createTemplateDetail } from './components/template-detail.mjs';
+import { renderMarkdownInto } from './markdown.mjs';
 
 // ---------------------------------------------------------------------------
 // Route: Dashboard (/)
@@ -199,6 +204,154 @@ registerRoute('/projects/:id/edit', async (container, params) => {
     section.append(form);
   } catch (err) {
     section.innerHTML = `<p style="color: var(--color-error);">Project not found: ${err.message}</p>`;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Route: Templates list (/templates)
+// ---------------------------------------------------------------------------
+
+registerRoute('/templates', async (container) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+  container.append(section);
+
+  const header = document.createElement('div');
+  header.style.display = 'flex';
+  header.style.justifyContent = 'space-between';
+  header.style.alignItems = 'center';
+  header.style.marginBottom = 'var(--space-lg)';
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'Section Templates';
+
+  const newBtn = document.createElement('a');
+  newBtn.href = '/templates/new';
+  newBtn.setAttribute('data-link', '');
+  newBtn.className = 'btn btn-primary';
+  newBtn.textContent = '+ New Template';
+
+  header.append(heading, newBtn);
+  section.append(header);
+
+  try {
+    const templates = await fetchTemplates();
+    if (templates.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'text-muted';
+      empty.textContent = 'No templates yet. Create your first template to get started.';
+      section.append(empty);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'grid grid--2';
+      for (const template of templates) {
+        const card = createTemplateCard(template);
+        card.addEventListener('click', () => navigate(`/templates/${template.id}`));
+        grid.append(card);
+      }
+      section.append(grid);
+    }
+  } catch (err) {
+    const errMsg = document.createElement('p');
+    errMsg.style.color = 'var(--color-error)';
+    errMsg.textContent = `Failed to load templates: ${err.message}`;
+    section.append(errMsg);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Route: New template (/templates/new)
+// ---------------------------------------------------------------------------
+
+registerRoute('/templates/new', (container) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'Create New Template';
+  heading.style.marginBottom = 'var(--space-lg)';
+  section.append(heading);
+
+  const form = createTemplateForm({
+    onSubmit: async (data) => {
+      try {
+        await createTemplate(data);
+        navigate('/templates');
+      } catch (err) {
+        alert(`Failed to create template: ${err.message}`);
+      }
+    },
+  });
+  section.append(form);
+  container.append(section);
+});
+
+// ---------------------------------------------------------------------------
+// Route: Template detail (/templates/:id)
+// ---------------------------------------------------------------------------
+
+registerRoute('/templates/:id', async (container, params) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+  section.innerHTML = '<p class="text-muted">Loading template...</p>';
+  container.append(section);
+
+  try {
+    const template = await fetchTemplate(params.id);
+    section.innerHTML = '';
+
+    const detail = createTemplateDetail({
+      item: template,
+      renderMarkdown: renderMarkdownInto,
+      onEdit: () => navigate(`/templates/${template.id}/edit`),
+      onDelete: async () => {
+        try {
+          await deleteTemplate(template.id);
+          navigate('/templates');
+        } catch (err) {
+          alert(`Failed to delete: ${err.message}`);
+        }
+      },
+    });
+    section.append(detail);
+  } catch (err) {
+    section.innerHTML = `<p style="color: var(--color-error);">Template not found: ${err.message}</p>`;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Route: Edit template (/templates/:id/edit)
+// ---------------------------------------------------------------------------
+
+registerRoute('/templates/:id/edit', async (container, params) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+  section.innerHTML = '<p class="text-muted">Loading...</p>';
+  container.append(section);
+
+  try {
+    const template = await fetchTemplate(params.id);
+    section.innerHTML = '';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Edit Template';
+    heading.style.marginBottom = 'var(--space-lg)';
+    section.append(heading);
+
+    const form = createTemplateForm({
+      item: template,
+      onSubmit: async (data) => {
+        try {
+          await updateTemplate(template.id, data);
+          navigate(`/templates/${template.id}`);
+        } catch (err) {
+          alert(`Failed to update: ${err.message}`);
+        }
+      },
+    });
+    section.append(form);
+  } catch (err) {
+    section.innerHTML = `<p style="color: var(--color-error);">Template not found: ${err.message}</p>`;
   }
 });
 
