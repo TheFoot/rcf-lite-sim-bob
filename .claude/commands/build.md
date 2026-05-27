@@ -40,6 +40,16 @@ Per-stage write checklist:
 
 Execute these stages IN ORDER. Do not skip any stage. Do not proceed to the next stage until the current one is complete.
 
+### Before Stage 1: Create feature branch
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/BS-NNN-<short-description>
+```
+
+This branch is where ALL work for this build spec happens. Every commit in the cycle below goes to this branch and is pushed immediately.
+
 ### Stage 1: DEFINE
 
 **First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"defining"` and `startedAt` to the current ISO timestamp (e.g. `"2026-05-27T10:15:00Z"`). This write must happen BEFORE any other work in this stage.
@@ -49,7 +59,13 @@ Read the build spec. For each acceptance criterion listed in the spec:
 - Create `rcf/tests/TS-NNN.json` with the test spec (ID, title, acceptance criteria IDs, test case descriptions)
 - Create the actual test file at `src/tests/bs-NNN.test.mjs` with the test scaffolding
 
-Commit: `test(BS-NNN): define test specs for N acceptance criteria`
+Commit and push:
+```bash
+git add -A && git commit -m "test(BS-NNN): define test specs for N acceptance criteria
+
+Traces: REQ-NNN, US-NNN, AC-NNN-01 through AC-NNN-NN"
+git push origin feat/BS-NNN-<short-description>
+```
 
 Show the user the test spec. Ask: "Tests defined. Proceeding to build."
 
@@ -61,7 +77,13 @@ Implement the code to satisfy the acceptance criteria. Follow the standards in `
 
 Write code to `src/server/` (backend) and/or `src/public/` (frontend) as appropriate.
 
-Commit: `feat(BS-NNN): implement <description>`
+Commit and push:
+```bash
+git add -A && git commit -m "feat(BS-NNN): implement <description>
+
+Traces: REQ-NNN -- <requirement title>"
+git push origin feat/BS-NNN-<short-description>
+```
 
 ### Stage 3: REVIEW
 
@@ -84,7 +106,11 @@ Review the code you just wrote against:
   - Text blocks have breathing room -- adequate `line-height`, `padding`, and `margin` to create readable visual groupings. No text crammed edge-to-edge inside containers.
   - Containers that may receive many items (lists, boards, card grids) have a sensible `max-height` with `overflow-y: auto` so the layout does not stretch infinitely.
 
-If issues are found, fix them before proceeding. Commit fixes: `fix(BS-NNN): <what was fixed>`
+If issues are found, fix them before proceeding. Commit and push fixes:
+```bash
+git add -A && git commit -m "fix(BS-NNN): <what was fixed>"
+git push origin feat/BS-NNN-<short-description>
+```
 
 ### Stage 4: TEST
 
@@ -95,7 +121,11 @@ Run the tests: `node --test src/tests/bs-NNN.test.mjs`
 - If all tests pass: proceed to Stage 5
 - If tests fail: fix the code (not the tests, unless the test itself is wrong). Re-run. Maximum 3 fix attempts -- if still failing after 3 tries, note the failures and proceed (don't get stuck)
 
-Commit test fixes if any: `fix(BS-NNN): resolve test failures`
+Commit and push test fixes if any:
+```bash
+git add -A && git commit -m "fix(BS-NNN): resolve test failures"
+git push origin feat/BS-NNN-<short-description>
+```
 
 ### Stage 5: FINALISE
 
@@ -107,10 +137,46 @@ Commit test fixes if any: `fix(BS-NNN): resolve test failures`
   - Set `stats.buildSpecsVerified` to the correct count
   - Set `stats.testsPassing` and `stats.testsTotal` to actual numbers
 - Regenerate `rcf/trace.json` (the full traceability index)
-- Final commit: `chore(BS-NNN): finalise -- all tests passing`
+- Final commit and push:
+```bash
+git add -A && git commit -m "chore(BS-NNN): finalise -- N tests passing, traceability updated"
+git push origin feat/BS-NNN-<short-description>
+```
+
+### After Stage 5: Open PR and merge
+
+Open a pull request from the feature branch to `main`:
+
+```bash
+gh pr create --base main --title "BS-NNN: <build spec title>" --body "$(cat <<'EOF'
+## BS-NNN: <title>
+
+### Traces to
+- REQ-NNN: <requirement title>
+- US-NNN: <story title>
+- Acceptance criteria: <list AC IDs>
+
+### What was built
+<2-3 bullet points>
+
+### Test results
+- N/N tests passing
+- All acceptance criteria verified
+
+Built with RCF methodology
+EOF
+)"
+```
+
+Then merge and return to main:
+```bash
+gh pr merge --squash --delete-branch
+git checkout main
+git pull origin main
+```
 
 Report to the user:
-- "BS-NNN complete. N/M acceptance criteria verified."
+- "BS-NNN complete. N/M acceptance criteria verified. PR merged."
 - "Traceability: REQ-XXX -> US-XXX -> AC-XXX-XX -> BS-NNN -> TS-NNN (passing)"
 - "Next: run `/build BS-NNN+1`" or "All build specs complete! Run `/present`."
 

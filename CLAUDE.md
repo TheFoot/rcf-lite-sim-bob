@@ -211,6 +211,58 @@ The dashboard reads `rcf/` files via SSE file watcher. For the dashboard to show
 
 Do NOT batch status updates to the end of the build. Each stage transition is a separate write. If the build spec JSON is only modified once (at finalise), the pipeline board never shows live progress.
 
+### Git workflow -- branch/PR discipline
+
+Every build spec uses a feature branch. This creates a clean PR history that demonstrates professional engineering practice.
+
+**Branch naming:** `feat/BS-NNN-short-description` (e.g., `feat/BS-001-project-management`)
+
+**Flow per build spec:**
+1. Before Stage 1: create and checkout the feature branch from `main`
+2. Each stage: commit with the standard message format (see below) and `git push origin <branch>` after every commit
+3. After Stage 5 (finalise): open a PR from the feature branch to `main` using the PR template below, then merge the PR and checkout `main`
+
+**Commit message format** -- include RCF IDs for traceability:
+```
+test(BS-001): define test specs for 6 acceptance criteria
+
+Traces: REQ-001, US-001, AC-001-01 through AC-001-03
+```
+```
+feat(BS-001): implement project management CRUD
+
+Traces: REQ-001 -- Project management
+```
+```
+fix(BS-001): review -- heading margins, validation gaps
+```
+```
+chore(BS-001): finalise -- 8 tests passing, traceability updated
+```
+
+**PR description template:**
+```markdown
+## BS-NNN: <title>
+
+### Traces to
+- REQ-NNN: <requirement title>
+- US-NNN: <story title>
+- Acceptance criteria: AC-NNN-01, AC-NNN-02, ...
+
+### What was built
+<2-3 bullet points>
+
+### Test results
+- N/N tests passing
+- All acceptance criteria verified
+
+Built with RCF methodology
+```
+
+**Push after every commit.** This is non-negotiable. Regular pushes enable live monitoring and team visibility. A build spec with only a single push at the end defeats the purpose.
+
+For `/define` and `/design` phases: commit and push directly to `main` (these are planning artefacts, not code).
+
 ### Context break points
 
 These are natural points to suggest a fresh session:

@@ -1,51 +1,64 @@
-# /present -- Generate presentation materials
+# /present -- Generate a compact 5-minute presentation talk track
 
-Produce materials for presenting this project, including a summary, traceability report, and talking points.
+Produce a talk track and demo notes for a tight 5-minute presentation slot. This is NOT a technical report -- it is a script the presenter can follow while showing the app and dashboard live.
 
 ## Steps
 
-1. **Read all RCF docs.** Full project state.
+1. **Read all RCF docs.** Full project state -- project.json, prd.json, design.json, build specs, test specs, trace.json.
 
-2. **Generate a project summary** (write to `PRESENTATION.md`):
+2. **Generate `PRESENTATION.md`** with this exact structure:
 
-   ### Product Overview
-   - What was built and why (from the PRD)
-   - The problem it solves
-   - Key features (from requirements)
+### Opening (30 seconds)
 
-   ### How AI Was Used
-   - Requirements captured and structured via RCF
-   - Technical design auto-generated from standards
-   - Code generated through the 5-stage build cycle
-   - Tests derived from acceptance criteria
-   - Standards enforced automatically
+One sentence: what was built and why. One sentence: what makes it impressive (built in N minutes, N requirements fully traced, N tests all passing). Keep it punchy.
 
-   ### Traceability Chain
-   For each requirement, show the full chain:
-   ```
-   REQ-001: <title>
-    -> US-001: <title>
-       -> AC-001-01: <criterion>
-          -> BS-001: <build spec title> [verified]
-             -> TS-001: 2/2 tests passing
-   ```
+### Live demo flow (3 minutes)
 
-   ### Technical Architecture
-   - Components (from design.json)
-   - Standards applied (list the standards docs)
-   - Technology stack summary
+A numbered walkthrough the presenter follows while screen-sharing the app. Each step is one action + one sentence of what to say:
 
-   ### What RCF Provides
-   - Structured requirements gathering
-   - Automatic standards enforcement
-   - Traceable code -- every line links to a business requirement
-   - Built-in testing from acceptance criteria
-   - Methodology scales from hackathon to production (via full RCF)
+1. Show the landing page -- point out it is populated with realistic data, not empty
+2. Walk through the core user journey (create something, view it, edit it, delete it)
+3. Show one feature-specific highlight (the thing that makes this app interesting beyond CRUD)
+4. Show the RCF dashboard (switch to the dashboard URL) -- point out the pipeline board, traceability chain, production readiness gauge
+5. Click into one requirement card to show the full trace: requirement -> story -> AC -> build spec -> tests
 
-   ### Demo Talking Points
-   - "Every line of code traces back to a business requirement"
-   - "Standards are baked into the AI context, not enforced by humans"
-   - "The 5-stage build cycle ensures nothing ships without review and tests"
-   - "RCF is the prototyping subset -- full RCF adds architecture docs, build sequencing, and formal test suites"
+Keep each step to ONE action. No multi-step detours.
 
-3. **Tell the user** the file is ready and suggest they review it. Offer to adjust talking points or emphasis.
+### The methodology story (1 minute)
+
+Three bullet points the presenter says out loud:
+- "Every line of code traces back to a business requirement -- click any item on the dashboard and you see the full chain"
+- "The AI followed the same standards everyone else used -- tech stack, coding patterns, security baseline -- all baked into the context, not enforced by humans"
+- "This is RCF -- structured AI development. The prototype took N minutes. The methodology scales to production with deeper specs and formal test suites"
+
+### Closing (30 seconds)
+
+Key metrics in one line: N requirements, N acceptance criteria, N tests passing, N% production readiness, built in N minutes.
+
+One sentence on what would come next (deeper requirements, production standards, CI/CD -- but the foundation is already traceable).
+
+3. **Also generate a `DEMO-NOTES.md`** -- a minimal cheat sheet:
+
+```
+APP:       http://localhost:NNNN
+DASHBOARD: http://localhost:NNNN
+METRICS:   N reqs | N ACs | N tests | N% readiness | Nm build
+
+DEMO PATH:
+1. Landing page (populated, not empty)
+2. Create/view/edit/delete [entity]
+3. [Feature highlight]
+4. Switch to dashboard
+5. Click REQ-001 -> trace chain
+
+KEY LINE: "Every line of code traces back to a business requirement"
+```
+
+4. **Tell the user** both files are ready. Suggest a dry run: "Walk through the demo flow once with the app open -- it should take under 3 minutes. The talk track fills the rest."
+
+## Important
+
+- **No per-requirement traceability dumps.** The dashboard shows this live -- the presenter clicks it, not reads it.
+- **No technical architecture section.** The judges see the code quality in the demo, not in a document.
+- **No bullet-point lists of "what RCF provides".** One clear methodology story, told as speech, not slides.
+- The presentation is a PERFORMANCE, not a DOCUMENT. Write it as things to say and do, not things to read.
