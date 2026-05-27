@@ -95,6 +95,7 @@ Review your own work against the build spec. Check:
 - Does it follow the standards in `standards/`?
 - Are there any obvious bugs or security issues?
 - **Layout polish (for any frontend work):** headings have adequate margin top/bottom; column widths are proportional to content (text-heavy columns wider than badge/action columns); text has breathing room (padding, line-height); list/board containers have `max-height` with `overflow-y: auto`.
+- **Navigation (for any frontend work):** every detail page has a breadcrumb or back-link to its parent list. Every form page has navigation back to the parent. No page should strand the user. See `standards/spa-patterns.md` Navigation section.
 
 If you find issues, fix them before proceeding.
 
@@ -282,7 +283,7 @@ The auto-boot ensures a fresh session picks up exactly where the last one left o
 | `/design` | After requirements are defined. Generates technical design and ordered build specs. |
 | `/build` | Takes a build spec ID (e.g., `/build BS-001`). Runs the 5-stage cycle. |
 | `/verify` | Quick verification pass -- checks test coverage, runs any pending tests. |
-| `/review` | Comprehensive post-build quality review. Fixes test runner issues, closes coverage gaps, verifies UI quality. Run after all builds, before presenting. |
+| `/review` | Comprehensive post-build quality review. Fixes test runner issues, closes coverage gaps, verifies UI quality and navigation (every detail/form page must have back-navigation to its parent). Run after all builds, before presenting. |
 | `/extend` | Add features or change existing behaviour -- through the doc chain. Updates PRD and design first, then generates new build specs, then builds. The iteration cycle. |
 | `/status` | Project health check. What's done, what's next, any gaps. |
 | `/present` | Generate presentation materials: summary, traceability report, talking points. |

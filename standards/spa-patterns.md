@@ -114,6 +114,15 @@ Each entity type needs three views:
 2. **Detail view** -- Shows all fields for one item. Includes "Edit" and "Delete" actions. Delete shows a confirmation before removing.
 3. **Form view** -- Used for both create and edit. Pre-populated for edit mode. Validates required fields. On submit, persists via the API and navigates back to the list or detail.
 
+### Navigation
+
+Every page must have a clear path back to its parent. Users must never be stranded.
+
+- **Detail pages** must include a breadcrumb or back-link to the parent list page (e.g., "Projects / Project Name").
+- **Form pages** (create and edit) must include navigation back to the parent -- either a breadcrumb trail or a cancel link alongside the submit button.
+- **Nested pages** (e.g., a section within a project) must show the full hierarchy so the user can jump to any level.
+- The top-level nav bar is not sufficient on its own -- it covers entity roots but not parent-child relationships within an entity hierarchy.
+
 ### Interaction rules
 
 - Every list item is a clickable row or card. Use `<a data-link>` or a click handler that navigates to the detail route.
