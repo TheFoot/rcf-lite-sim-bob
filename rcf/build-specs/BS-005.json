@@ -1,0 +1,15 @@
+{
+  "id": "BS-005",
+  "title": "Document Assembly and Export",
+  "description": "Implement document assembly that collects approved/locked sections from a project, assembles them into a formatted document with heading hierarchy, auto-generated table of contents, and section numbering. Provide HTML preview in the SPA and export endpoints for PDF and DOCX using the project's docs utility (tools/utils/docs.mjs). Frontend adds Preview Document button to project detail and export buttons to the preview view.",
+  "requirement": "REQ-005",
+  "story": ["US-006", "US-007"],
+  "acceptanceCriteria": ["AC-006-01", "AC-006-02", "AC-006-03", "AC-007-01", "AC-007-02"],
+  "designContext": "Use tools/utils/docs.mjs for PDF (createPdf) and DOCX (createDocx) generation -- these are pre-approved utilities. Use renderMarkdown from docs.mjs for server-side markdown-to-HTML conversion for the assembly endpoint. Assembly collects sections sorted by order, renders each section's markdown content, adds section numbering and heading hierarchy. The /api/v1/projects/:id/assemble endpoint returns rendered HTML. The /api/v1/projects/:id/export/:format endpoint returns file download. Frontend preview view shows the assembled HTML and provides download buttons.",
+  "standards": ["rest-api", "spa-patterns", "testing"],
+  "dependencies": ["BS-001", "BS-002", "BS-003"],
+  "status": "ready",
+  "order": 5,
+  "created": "2026-05-27T10:25:00.000Z",
+  "updated": "2026-05-27T10:25:00.000Z"
+}

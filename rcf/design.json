@@ -77,7 +77,10 @@
     { "method": "PUT", "path": "/api/v1/sections/:id", "purpose": "Update section content", "tracesTo": "REQ-002" },
     { "method": "DELETE", "path": "/api/v1/sections/:id", "purpose": "Delete section", "tracesTo": "REQ-002" },
     { "method": "PATCH", "path": "/api/v1/sections/:id/status", "purpose": "Transition section workflow status", "tracesTo": "REQ-003" },
-    { "method": "GET", "path": "/api/v1/dashboard", "purpose": "Dashboard summary data", "tracesTo": "REQ-004" }
+    { "method": "GET", "path": "/api/v1/dashboard", "purpose": "Dashboard summary data", "tracesTo": "REQ-004" },
+    { "method": "GET", "path": "/api/v1/projects/:id/assemble", "purpose": "Get assembled document HTML with TOC and section numbering", "tracesTo": "REQ-005" },
+    { "method": "GET", "path": "/api/v1/projects/:id/export/pdf", "purpose": "Export assembled document as PDF", "tracesTo": "REQ-005" },
+    { "method": "GET", "path": "/api/v1/projects/:id/export/docx", "purpose": "Export assembled document as DOCX", "tracesTo": "REQ-005" }
   ],
   "dataModel": [
     {

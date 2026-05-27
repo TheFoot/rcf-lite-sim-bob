@@ -194,6 +194,62 @@
           ]
         }
       ]
+    },
+    {
+      "id": "REQ-005",
+      "title": "Document Assembly and Export",
+      "description": "Assemble all approved sections in a project into a single formatted document with proper heading hierarchy, auto-generated table of contents, and section numbering. Export the assembled document as PDF and Word (DOCX) with professional formatting.",
+      "priority": "must",
+      "stories": [
+        {
+          "id": "US-006",
+          "title": "Preview assembled document",
+          "asA": "regulatory filing team member",
+          "iWant": "to preview all approved sections assembled into a single formatted document",
+          "soThat": "I can review the complete filing before exporting",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-006-01",
+              "given": "a project has approved or locked sections",
+              "when": "I click 'Preview Document'",
+              "then": "I see a formatted document with all qualifying sections assembled in order"
+            },
+            {
+              "id": "AC-006-02",
+              "given": "I am viewing the assembled document preview",
+              "when": "I look at the document structure",
+              "then": "I see an auto-generated table of contents, proper heading hierarchy, and section numbering"
+            },
+            {
+              "id": "AC-006-03",
+              "given": "I am viewing the assembled document preview",
+              "when": "the markdown content renders",
+              "then": "all section markdown is properly formatted as rich text within the assembled view"
+            }
+          ]
+        },
+        {
+          "id": "US-007",
+          "title": "Export document as PDF and DOCX",
+          "asA": "regulatory filing team member",
+          "iWant": "to download the assembled document as a PDF or Word file",
+          "soThat": "I can share professional-quality documents with stakeholders",
+          "acceptanceCriteria": [
+            {
+              "id": "AC-007-01",
+              "given": "I am viewing a project with approved sections",
+              "when": "I click 'Export as PDF'",
+              "then": "a professionally formatted PDF file is downloaded"
+            },
+            {
+              "id": "AC-007-02",
+              "given": "I am viewing a project with approved sections",
+              "when": "I click 'Export as DOCX'",
+              "then": "a professionally formatted Word document is downloaded"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
