@@ -38,7 +38,7 @@ Read the build spec. For each acceptance criterion listed in the spec:
 - Create `rcf/tests/TS-NNN.json` with the test spec (ID, title, acceptance criteria IDs, test case descriptions)
 - Create the actual test file at `src/tests/bs-NNN.test.mjs` with the test scaffolding
 
-Update build spec status to "defining". Commit: `test(BS-NNN): define test specs for N acceptance criteria`
+Update build spec status to "defining". Set `startedAt` to the current ISO timestamp (e.g. `"2026-05-27T10:15:00Z"`). Commit: `test(BS-NNN): define test specs for N acceptance criteria`
 
 Show the user the test spec. Ask: "Tests defined. Proceeding to build."
 
@@ -77,7 +77,7 @@ Commit test fixes if any: `fix(BS-NNN): resolve test failures`
 
 ### Stage 5: FINALISE
 
-- Update build spec status to "verified" in `rcf/build-specs/BS-NNN.json`
+- Update build spec status to "verified" in `rcf/build-specs/BS-NNN.json`. Set `completedAt` to the current ISO timestamp.
 - Update `rcf/tests/TS-NNN.json`:
   - Set top-level `status` to `"passed"`
   - Set EVERY `testCases[].status` to `"passing"` for tests that passed, `"failing"` for tests that failed. This is critical -- the dashboard coverage gauges read these statuses. If you leave them as `"pending"`, the coverage section shows 0%.

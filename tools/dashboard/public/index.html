@@ -1308,6 +1308,17 @@
       html += `<div class="stat-item"><span class="stat-value">${totalAc}</span><span class="stat-label">Acceptance Criteria</span></div>`;
       html += `<div class="stat-item"><span class="stat-value">${verifiedBs}/${totalBs}</span><span class="stat-label">Build Specs Verified</span></div>`;
       html += `<div class="stat-item"><span class="stat-value">${passingTests}</span><span class="stat-label">Tests Passing</span></div>`;
+
+      // Total build time from earliest startedAt to latest completedAt
+      const starts = (buildSpecs || []).map(bs => bs.startedAt).filter(Boolean).sort();
+      const ends = (buildSpecs || []).map(bs => bs.completedAt).filter(Boolean).sort();
+      if (starts.length > 0 && ends.length > 0) {
+        const totalTime = formatDuration(starts[0], ends[ends.length - 1]);
+        if (totalTime) {
+          html += `<div class="stat-item"><span class="stat-value">${totalTime}</span><span class="stat-label">Total Build Time</span></div>`;
+        }
+      }
+
       html += '</div>';
       html += '</div>';
 
@@ -1452,7 +1463,7 @@
             <span class="build-spec-id">${esc(bs.id)}</span>
             <div class="build-spec-info">
               <div class="build-spec-title">${esc(bs.title)}</div>
-              <div class="build-spec-ac">${(bs.acceptanceCriteria || []).length} acceptance criteria</div>
+              <div class="build-spec-ac">${(bs.acceptanceCriteria || []).length} acceptance criteria${bs.startedAt && bs.completedAt ? ` -- ${formatDuration(bs.startedAt, bs.completedAt)}` : bs.startedAt ? ' -- building...' : ''}</div>
             </div>
             <div class="stage-progress" title="Build cycle stage: ${bs.status}">
               ${segmentsHtml}
@@ -1705,6 +1716,17 @@
 
     function renderEmptyState(title, hint) {
       return `<div class="empty-state"><p>${title}</p><p>${hint}</p></div>`;
+    }
+
+    function formatDuration(startIso, endIso) {
+      if (!startIso || !endIso) return '';
+      const ms = new Date(endIso) - new Date(startIso);
+      if (ms < 0 || isNaN(ms)) return '';
+      const secs = Math.floor(ms / 1000);
+      if (secs < 60) return `${secs}s`;
+      const mins = Math.floor(secs / 60);
+      const remSecs = secs % 60;
+      return remSecs > 0 ? `${mins}m ${remSecs}s` : `${mins}m`;
     }
 
     function capitalize(s) {
@@ -2032,8 +2054,9 @@
         <div class="detail-header">
           <div class="detail-req-id">${esc(bsId)}</div>
           <div class="detail-req-title">${esc(bs.title)}</div>
-          <div style="margin-top: var(--space-sm);">
+          <div style="margin-top: var(--space-sm); display: flex; align-items: center; gap: var(--space-md);">
             <span class="status-badge tip" data-status="${bs.status}" data-tip="${bsStatusTips[bs.status] || ''}">${esc(bs.status)}</span>
+            ${bs.startedAt && bs.completedAt ? `<span style="font-size: var(--font-size-sm); color: var(--color-text-muted);">Built in ${formatDuration(bs.startedAt, bs.completedAt)}</span>` : bs.startedAt ? '<span style="font-size: var(--font-size-sm); color: var(--color-text-muted);">Building...</span>' : ''}
           </div>
         </div>`;
 
