@@ -71,6 +71,8 @@ Each build spec executes through 5 stages. This is serial -- one build spec at a
 
 ### Stage 1: DEFINE
 
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"defining"` and `startedAt` to the current ISO timestamp. This write must happen BEFORE any other work.
+
 Read the build spec (BS-NNN.json). Generate test specs from the acceptance criteria:
 
 - Write 2-4 tests per acceptance criterion: at minimum a happy-path test, an edge case, and an error/validation case.
@@ -80,18 +82,25 @@ Read the build spec (BS-NNN.json). Generate test specs from the acceptance crite
 
 ### Stage 2: BUILD
 
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"building"`. This write must happen BEFORE writing any implementation code.
+
 Implement the code. The build spec contains everything you need: the requirement, acceptance criteria, design context, and applicable standards. Generate code that satisfies the acceptance criteria and follows the standards. Write to `src/`.
 
 ### Stage 3: REVIEW
+
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"reviewing"`.
 
 Review your own work against the build spec. Check:
 - Does the implementation satisfy each acceptance criterion?
 - Does it follow the standards in `standards/`?
 - Are there any obvious bugs or security issues?
+- **Layout polish (for any frontend work):** headings have adequate margin top/bottom; column widths are proportional to content (text-heavy columns wider than badge/action columns); text has breathing room (padding, line-height); list/board containers have `max-height` with `overflow-y: auto`.
 
 If you find issues, fix them before proceeding.
 
 ### Stage 4: TEST
+
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"testing"`.
 
 Run the tests from Stage 1. Fix any failures. Keep iterations minimal -- if a test is failing due to a test-writing issue (not a code issue), simplify the test. The goal is a passing chain, not comprehensive coverage.
 
@@ -196,10 +205,11 @@ The CLAUDE.md, standards, and current RCF docs consume context. Be mindful:
 The dashboard reads `rcf/` files via SSE file watcher. For the dashboard to show live progress:
 
 - Update `rcf/build-specs/BS-NNN.json` status at EVERY stage transition: `ready` -> `defining` -> `building` -> `reviewing` -> `testing` -> `verified`
+- **The status write is the FIRST action in each stage, before any other work.** Write `startedAt` at the moment Stage 1 begins -- never retroactively.
 - Update `rcf/project.json` stats after each spec completes (increment `buildSpecsVerified`, update `testsPassing`/`testsTotal`)
 - These writes trigger the SSE watcher, so the dashboard pipeline board and build progress section update automatically
 
-Do NOT batch status updates to the end of the build. Each stage transition is a write.
+Do NOT batch status updates to the end of the build. Each stage transition is a separate write. If the build spec JSON is only modified once (at finalise), the pipeline board never shows live progress.
 
 ### Context break points
 

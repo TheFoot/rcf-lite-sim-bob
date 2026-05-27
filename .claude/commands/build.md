@@ -23,9 +23,18 @@ When the user asks to build all specs:
 - If the spec has dependencies, all dependencies must have status "verified"
 - If no ID is given and only one spec remains, start it. If multiple remain, confirm with the user or build all in order.
 
-## Status updates (critical for dashboard)
+## Status updates (CRITICAL -- non-negotiable)
 
-Update `rcf/build-specs/BS-NNN.json` status at EVERY stage transition: `ready` -> `defining` -> `building` -> `reviewing` -> `testing` -> `verified`. Each write triggers the dashboard to update via SSE. Do NOT batch updates to the end.
+Update `rcf/build-specs/BS-NNN.json` status at EVERY stage transition: `ready` -> `defining` -> `building` -> `reviewing` -> `testing` -> `verified`. Each write triggers the dashboard to update via SSE.
+
+**The status write is the FIRST action in each stage, before any other work.** Do NOT batch updates to the end. Do NOT write `startedAt` retroactively from memory -- write it at the moment Stage 1 begins. The dashboard's live pipeline progress depends on seeing intermediate statuses. If the file is only modified once (at finalise), the pipeline board never shows progress -- it jumps from "ready" to "verified" with no intermediate states visible.
+
+Per-stage write checklist:
+- **Stage 1 start:** write `status: "defining"` + `startedAt: <now>` to BS-NNN.json
+- **Stage 2 start:** write `status: "building"` to BS-NNN.json
+- **Stage 3 start:** write `status: "reviewing"` to BS-NNN.json
+- **Stage 4 start:** write `status: "testing"` to BS-NNN.json
+- **Stage 5:** write `status: "verified"` + `completedAt: <now>` to BS-NNN.json
 
 ## The 5-stage cycle
 
@@ -33,24 +42,30 @@ Execute these stages IN ORDER. Do not skip any stage. Do not proceed to the next
 
 ### Stage 1: DEFINE
 
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"defining"` and `startedAt` to the current ISO timestamp (e.g. `"2026-05-27T10:15:00Z"`). This write must happen BEFORE any other work in this stage.
+
 Read the build spec. For each acceptance criterion listed in the spec:
 - Write 1-2 test cases that would prove the criterion is met
 - Create `rcf/tests/TS-NNN.json` with the test spec (ID, title, acceptance criteria IDs, test case descriptions)
 - Create the actual test file at `src/tests/bs-NNN.test.mjs` with the test scaffolding
 
-Update build spec status to "defining". Set `startedAt` to the current ISO timestamp (e.g. `"2026-05-27T10:15:00Z"`). Commit: `test(BS-NNN): define test specs for N acceptance criteria`
+Commit: `test(BS-NNN): define test specs for N acceptance criteria`
 
 Show the user the test spec. Ask: "Tests defined. Proceeding to build."
 
 ### Stage 2: BUILD
 
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"building"`. This write must happen BEFORE writing any implementation code.
+
 Implement the code to satisfy the acceptance criteria. Follow the standards in `standards/`. Use the design context from `rcf/design.json`.
 
 Write code to `src/server/` (backend) and/or `src/public/` (frontend) as appropriate.
 
-Update build spec status to "building". Commit: `feat(BS-NNN): implement <description>`
+Commit: `feat(BS-NNN): implement <description>`
 
 ### Stage 3: REVIEW
+
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"reviewing"`. This write must happen BEFORE starting the review.
 
 Review the code you just wrote against:
 - Each acceptance criterion in the build spec -- is it satisfied?
@@ -63,10 +78,17 @@ Review the code you just wrote against:
   - The main page opens with project context (what is this, what does it do)
   - Seed data is present so the app looks alive on first run
   - Navigation is obvious and functional
+- **Layout polish (mandatory for any frontend work):**
+  - Headings have adequate margin above and below -- they should not be crammed against adjacent content. Check both `margin-top` and `margin-bottom` on all `h1`-`h6` elements.
+  - In row/column layouts (headers, grid rows, tables), column widths are proportional to content. A column containing a paragraph of text must get more width than a column with a small badge or action button. Equal-width columns where content sizes vary dramatically looks wrong -- use CSS grid `fr` units or flex with appropriate proportions.
+  - Text blocks have breathing room -- adequate `line-height`, `padding`, and `margin` to create readable visual groupings. No text crammed edge-to-edge inside containers.
+  - Containers that may receive many items (lists, boards, card grids) have a sensible `max-height` with `overflow-y: auto` so the layout does not stretch infinitely.
 
 If issues are found, fix them before proceeding. Commit fixes: `fix(BS-NNN): <what was fixed>`
 
 ### Stage 4: TEST
+
+**First:** update `rcf/build-specs/BS-NNN.json` -- set `status` to `"testing"`. This write must happen BEFORE running any tests.
 
 Run the tests: `node --test src/tests/bs-NNN.test.mjs`
 

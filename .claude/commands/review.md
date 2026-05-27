@@ -48,6 +48,14 @@ Navigate to each page/view and verify:
 - Text is readable (not clipped, not overflowing, contrast is adequate)
 - Responsive layout is not broken at the default viewport
 
+**5a-ii. Layout polish checks**
+
+Use `browser_evaluate` with `getComputedStyle` to verify:
+- **Heading margins:** Every `h1`-`h6` has adequate `margin-top` and `margin-bottom` (at minimum 0.5em above, 0.25em below). Headings crammed against adjacent content look unprofessional.
+- **Column proportionality:** In row/column layouts (header rows, grid layouts, tables with mixed content), columns with substantial text content must be wider than columns with small badges, icons, or action buttons. Use `browser_evaluate` to compare column widths -- if a text-heavy column and a badge column are the same width, that is a failure. Fix with CSS grid `fr` units, flex `grow`/`basis`, or explicit width proportions.
+- **Text breathing room:** Text blocks inside containers have adequate padding and line-height. No text crammed edge-to-edge. Check `padding` on text containers is at least 0.5rem.
+- **Scroll containment:** Any container that could receive an unbounded number of items (lists, boards, card grids) has `max-height` with `overflow-y: auto` set. Check with `getComputedStyle` -- if `maxHeight` is `none` on a potentially long list, flag it.
+
 **5b. Rendering integrity**
 
 Check for common rendering failures:
