@@ -1,6 +1,6 @@
 /**
  * Meeting Notes -- SPA entry point.
- * Traces: REQ-001
+ * Traces: REQ-001, REQ-002
  */
 
 import { initRouter, registerRoute, navigate } from './router.mjs';
@@ -8,6 +8,10 @@ import { fetchMeetings, fetchMeeting, createMeeting, updateMeeting, deleteMeetin
 import { createMeetingCard } from './components/meeting-card.mjs';
 import { createMeetingForm } from './components/meeting-form.mjs';
 import { createMeetingDetail } from './components/meeting-detail.mjs';
+import { fetchActionItems, fetchActionItem, createActionItem, updateActionItem, deleteActionItem } from './services/action-items-api.mjs';
+import { createActionItemCard } from './components/action-item-card.mjs';
+import { createActionItemDetail } from './components/action-item-detail.mjs';
+import { createActionItemForm } from './components/action-item-form.mjs';
 
 // ---------------------------------------------------------------------------
 // Route: Dashboard (/) -- placeholder until BS-003
@@ -97,7 +101,6 @@ registerRoute('/meetings/new', (container) => {
   const section = document.createElement('section');
   section.className = 'card';
 
-  // Breadcrumb
   const breadcrumb = document.createElement('nav');
   breadcrumb.className = 'breadcrumb';
   const backLink = document.createElement('a');
@@ -159,6 +162,47 @@ registerRoute('/meetings/:id', async (container, params) => {
       },
     });
     section.append(detail);
+
+    // Action Items panel
+    const aiPanel = document.createElement('section');
+    aiPanel.className = 'card';
+    aiPanel.style.marginTop = 'var(--space-lg)';
+    container.append(aiPanel);
+
+    const aiHeader = document.createElement('div');
+    aiHeader.style.display = 'flex';
+    aiHeader.style.justifyContent = 'space-between';
+    aiHeader.style.alignItems = 'center';
+    aiHeader.style.marginBottom = 'var(--space-lg)';
+
+    const aiHeading = document.createElement('h2');
+    aiHeading.textContent = 'Action Items';
+
+    const addAiBtn = document.createElement('a');
+    addAiBtn.href = `/meetings/${meeting.id}/action-items/new`;
+    addAiBtn.setAttribute('data-link', '');
+    addAiBtn.className = 'btn btn-primary';
+    addAiBtn.textContent = '+ Add Action Item';
+
+    aiHeader.append(aiHeading, addAiBtn);
+    aiPanel.append(aiHeader);
+
+    const actionItems = await fetchActionItems(meeting.id);
+    if (actionItems.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'text-muted';
+      empty.textContent = 'No action items yet. Add an action item to track follow-ups.';
+      aiPanel.append(empty);
+    } else {
+      const aiList = document.createElement('div');
+      aiList.className = 'action-items-list';
+      for (const ai of actionItems) {
+        const card = createActionItemCard(ai);
+        card.addEventListener('click', () => navigate(`/action-items/${ai.id}`));
+        aiList.append(card);
+      }
+      aiPanel.append(aiList);
+    }
   } catch (err) {
     section.innerHTML = `<p style="color: var(--color-error);">Meeting not found: ${err.message}</p>`;
   }
@@ -178,7 +222,6 @@ registerRoute('/meetings/:id/edit', async (container, params) => {
     const meeting = await fetchMeeting(params.id);
     section.innerHTML = '';
 
-    // Breadcrumb
     const breadcrumb = document.createElement('nav');
     breadcrumb.className = 'breadcrumb';
     const meetingsLink = document.createElement('a');
@@ -220,6 +263,180 @@ registerRoute('/meetings/:id/edit', async (container, params) => {
     section.append(form);
   } catch (err) {
     section.innerHTML = `<p style="color: var(--color-error);">Meeting not found: ${err.message}</p>`;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Route: New action item (/meetings/:id/action-items/new)
+// ---------------------------------------------------------------------------
+
+registerRoute('/meetings/:id/action-items/new', async (container, params) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+  container.append(section);
+
+  let meetingTitle = 'Meeting';
+  try {
+    const meeting = await fetchMeeting(params.id);
+    meetingTitle = meeting.title;
+  } catch { /* use default */ }
+
+  const breadcrumb = document.createElement('nav');
+  breadcrumb.className = 'breadcrumb';
+  const meetingsLink = document.createElement('a');
+  meetingsLink.href = '/meetings';
+  meetingsLink.setAttribute('data-link', '');
+  meetingsLink.textContent = 'Meetings';
+  const sep1 = document.createElement('span');
+  sep1.textContent = ' / ';
+  sep1.className = 'breadcrumb__separator';
+  const meetingLink = document.createElement('a');
+  meetingLink.href = `/meetings/${params.id}`;
+  meetingLink.setAttribute('data-link', '');
+  meetingLink.textContent = meetingTitle;
+  const sep2 = document.createElement('span');
+  sep2.textContent = ' / ';
+  sep2.className = 'breadcrumb__separator';
+  const cur = document.createElement('span');
+  cur.textContent = 'New Action Item';
+  cur.className = 'breadcrumb__current';
+  breadcrumb.append(meetingsLink, sep1, meetingLink, sep2, cur);
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'Add Action Item';
+  heading.style.marginBottom = 'var(--space-lg)';
+
+  section.append(breadcrumb, heading);
+
+  const form = createActionItemForm({
+    meetingId: params.id,
+    onSubmit: async (data) => {
+      try {
+        await createActionItem(data);
+        navigate(`/meetings/${params.id}`);
+      } catch (err) {
+        alert(`Failed to create action item: ${err.message}`);
+      }
+    },
+  });
+  section.append(form);
+});
+
+// ---------------------------------------------------------------------------
+// Route: Action item detail (/action-items/:id)
+// ---------------------------------------------------------------------------
+
+registerRoute('/action-items/:id', async (container, params) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+  section.innerHTML = '<p class="text-muted">Loading action item...</p>';
+  container.append(section);
+
+  try {
+    const actionItem = await fetchActionItem(params.id);
+    let meetingTitle = 'Meeting';
+    try {
+      const meeting = await fetchMeeting(actionItem.meetingId);
+      meetingTitle = meeting.title;
+    } catch { /* use default */ }
+
+    section.innerHTML = '';
+
+    const detail = createActionItemDetail({
+      item: actionItem,
+      meetingTitle,
+      onEdit: () => navigate(`/action-items/${actionItem.id}/edit`),
+      onDelete: async () => {
+        try {
+          await deleteActionItem(actionItem.id);
+          navigate(`/meetings/${actionItem.meetingId}`);
+        } catch (err) {
+          alert(`Failed to delete: ${err.message}`);
+        }
+      },
+      onStatusChange: async (newStatus) => {
+        try {
+          await updateActionItem(actionItem.id, { ...actionItem, status: newStatus });
+          navigate(`/action-items/${actionItem.id}`);
+        } catch (err) {
+          alert(`Failed to update status: ${err.message}`);
+        }
+      },
+    });
+    section.append(detail);
+  } catch (err) {
+    section.innerHTML = `<p style="color: var(--color-error);">Action item not found: ${err.message}</p>`;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Route: Edit action item (/action-items/:id/edit)
+// ---------------------------------------------------------------------------
+
+registerRoute('/action-items/:id/edit', async (container, params) => {
+  const section = document.createElement('section');
+  section.className = 'card';
+  section.innerHTML = '<p class="text-muted">Loading...</p>';
+  container.append(section);
+
+  try {
+    const actionItem = await fetchActionItem(params.id);
+    let meetingTitle = 'Meeting';
+    try {
+      const meeting = await fetchMeeting(actionItem.meetingId);
+      meetingTitle = meeting.title;
+    } catch { /* use default */ }
+
+    section.innerHTML = '';
+
+    const breadcrumb = document.createElement('nav');
+    breadcrumb.className = 'breadcrumb';
+    const meetingsLink = document.createElement('a');
+    meetingsLink.href = '/meetings';
+    meetingsLink.setAttribute('data-link', '');
+    meetingsLink.textContent = 'Meetings';
+    const sep1 = document.createElement('span');
+    sep1.textContent = ' / ';
+    sep1.className = 'breadcrumb__separator';
+    const meetingLink = document.createElement('a');
+    meetingLink.href = `/meetings/${actionItem.meetingId}`;
+    meetingLink.setAttribute('data-link', '');
+    meetingLink.textContent = meetingTitle;
+    const sep2 = document.createElement('span');
+    sep2.textContent = ' / ';
+    sep2.className = 'breadcrumb__separator';
+    const aiLink = document.createElement('a');
+    aiLink.href = `/action-items/${actionItem.id}`;
+    aiLink.setAttribute('data-link', '');
+    aiLink.textContent = actionItem.title;
+    const sep3 = document.createElement('span');
+    sep3.textContent = ' / ';
+    sep3.className = 'breadcrumb__separator';
+    const cur = document.createElement('span');
+    cur.textContent = 'Edit';
+    cur.className = 'breadcrumb__current';
+    breadcrumb.append(meetingsLink, sep1, meetingLink, sep2, aiLink, sep3, cur);
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Edit Action Item';
+    heading.style.marginBottom = 'var(--space-lg)';
+
+    section.append(breadcrumb, heading);
+
+    const form = createActionItemForm({
+      item: actionItem,
+      onSubmit: async (data) => {
+        try {
+          await updateActionItem(actionItem.id, data);
+          navigate(`/action-items/${actionItem.id}`);
+        } catch (err) {
+          alert(`Failed to update: ${err.message}`);
+        }
+      },
+    });
+    section.append(form);
+  } catch (err) {
+    section.innerHTML = `<p style="color: var(--color-error);">Action item not found: ${err.message}</p>`;
   }
 });
 
