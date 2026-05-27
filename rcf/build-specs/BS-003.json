@@ -2,15 +2,36 @@
   "id": "BS-003",
   "title": "Project Sections and Workflow",
   "description": "Implement project sections (working copies from templates) with full CRUD and workflow status transitions.",
-  "requirement": ["REQ-002", "REQ-003"],
-  "story": ["US-003", "US-004"],
-  "acceptanceCriteria": ["AC-003-01", "AC-003-02", "AC-003-03", "AC-004-01", "AC-004-02", "AC-004-03", "AC-004-04"],
+  "requirement": [
+    "REQ-002",
+    "REQ-003"
+  ],
+  "story": [
+    "US-003",
+    "US-004"
+  ],
+  "acceptanceCriteria": [
+    "AC-003-01",
+    "AC-003-02",
+    "AC-003-03",
+    "AC-004-01",
+    "AC-004-02",
+    "AC-004-03",
+    "AC-004-04"
+  ],
   "designContext": "Section entity with workflow state machine.",
-  "standards": ["rest-api", "spa-patterns", "testing", "security-baseline"],
-  "dependencies": ["BS-001", "BS-002"],
+  "standards": [
+    "rest-api",
+    "spa-patterns",
+    "testing",
+    "security-baseline"
+  ],
+  "dependencies": [
+    "BS-001",
+    "BS-002"
+  ],
   "status": "verified",
   "order": 3,
-  "startedAt": "2026-05-27T10:13:00.000Z",
   "created": "2026-05-27T10:02:00.000Z",
   "updated": "2026-05-27T10:18:00.000Z"
 }

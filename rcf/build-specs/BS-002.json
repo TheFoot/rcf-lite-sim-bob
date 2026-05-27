@@ -4,13 +4,24 @@
   "description": "Implement full CRUD for section templates: API routes with flat JSON persistence, frontend components (list, detail with markdown rendering, form with markdown editor), API service, and seed data with realistic regulatory content.",
   "requirement": "REQ-002",
   "story": "US-002",
-  "acceptanceCriteria": ["AC-002-01", "AC-002-02", "AC-002-03", "AC-002-04"],
+  "acceptanceCriteria": [
+    "AC-002-01",
+    "AC-002-02",
+    "AC-002-03",
+    "AC-002-04"
+  ],
   "designContext": "Entity: Template with fields id, name, category (enum: risk-factors, management-discussion, financial-summary, legal-disclaimers, other), content (markdown string), createdAt. Use scaffoldEntity() for boilerplate. Markdown rendered client-side using marked library (served from node_modules or bundled). Template detail view must show rendered HTML from markdown content.",
-  "standards": ["rest-api", "spa-patterns", "testing", "security-baseline"],
-  "dependencies": ["BS-001"],
+  "standards": [
+    "rest-api",
+    "spa-patterns",
+    "testing",
+    "security-baseline"
+  ],
+  "dependencies": [
+    "BS-001"
+  ],
   "status": "verified",
   "order": 2,
-  "startedAt": "2026-05-27T10:08:00.000Z",
   "created": "2026-05-27T10:02:00.000Z",
   "updated": "2026-05-27T10:12:00.000Z"
 }

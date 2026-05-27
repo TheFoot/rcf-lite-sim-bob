@@ -4,13 +4,23 @@
   "description": "Implement full CRUD for document projects: API routes with flat JSON persistence, frontend components (list, detail, form), API service, and seed data. Projects have name, description, deadline, team, and status fields.",
   "requirement": "REQ-001",
   "story": "US-001",
-  "acceptanceCriteria": ["AC-001-01", "AC-001-02", "AC-001-03", "AC-001-04"],
+  "acceptanceCriteria": [
+    "AC-001-01",
+    "AC-001-02",
+    "AC-001-03",
+    "AC-001-04"
+  ],
   "designContext": "Entity: Project with fields id, name, description, deadline, team, status, createdAt. Use scaffoldEntity() from tools/utils/scaffold.mjs for CRUD boilerplate, then customise. Use seedToFile() from tools/utils/seed.mjs for demo data. Mount routes on /api/v1/projects. Build SPA router in src/public/js/router.mjs for client-side navigation. Update index.html with app nav.",
-  "standards": ["rest-api", "spa-patterns", "testing", "security-baseline", "project-structure"],
+  "standards": [
+    "rest-api",
+    "spa-patterns",
+    "testing",
+    "security-baseline",
+    "project-structure"
+  ],
   "dependencies": [],
   "status": "verified",
   "order": 1,
-  "startedAt": "2026-05-27T10:03:00.000Z",
   "created": "2026-05-27T10:02:00.000Z",
   "updated": "2026-05-27T10:07:00.000Z"
 }

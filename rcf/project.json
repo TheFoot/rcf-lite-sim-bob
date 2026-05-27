@@ -4,10 +4,6 @@
   "phase": "verified",
   "created": "2026-05-27T10:00:00.000Z",
   "updated": "2026-05-27T10:30:00.000Z",
-  "ports": {
-    "app": 3000,
-    "dashboard": 3001
-  },
   "stats": {
     "requirements": 5,
     "stories": 7,

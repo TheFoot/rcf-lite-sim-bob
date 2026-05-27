@@ -3,14 +3,30 @@
   "title": "Document Assembly and Export",
   "description": "Document assembly and export with PDF and DOCX support using tools/utils/docs.mjs.",
   "requirement": "REQ-005",
-  "story": ["US-006", "US-007"],
-  "acceptanceCriteria": ["AC-006-01", "AC-006-02", "AC-006-03", "AC-007-01", "AC-007-02"],
+  "story": [
+    "US-006",
+    "US-007"
+  ],
+  "acceptanceCriteria": [
+    "AC-006-01",
+    "AC-006-02",
+    "AC-006-03",
+    "AC-007-01",
+    "AC-007-02"
+  ],
   "designContext": "Use tools/utils/docs.mjs for PDF and DOCX. Assembly collects approved/locked sections.",
-  "standards": ["rest-api", "spa-patterns", "testing"],
-  "dependencies": ["BS-001", "BS-002", "BS-003"],
+  "standards": [
+    "rest-api",
+    "spa-patterns",
+    "testing"
+  ],
+  "dependencies": [
+    "BS-001",
+    "BS-002",
+    "BS-003"
+  ],
   "status": "verified",
   "order": 5,
-  "startedAt": "2026-05-27T10:26:00.000Z",
   "created": "2026-05-27T10:25:00.000Z",
   "updated": "2026-05-27T10:30:00.000Z"
 }
