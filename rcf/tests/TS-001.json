@@ -1,0 +1,64 @@
+{
+  "id": "TS-001",
+  "buildSpec": "BS-001",
+  "acceptanceCriteria": [
+    "AC-001-01",
+    "AC-001-02",
+    "AC-001-03",
+    "AC-001-04"
+  ],
+  "testCases": [
+    {
+      "id": "TC-001-01",
+      "description": "POST /api/v1/meetings creates a meeting and returns 201",
+      "verifiesAc": "AC-001-01",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-02",
+      "description": "POST /api/v1/meetings returns 400 when title is missing",
+      "verifiesAc": "AC-001-01",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-03",
+      "description": "GET /api/v1/meetings returns all meetings as an array",
+      "verifiesAc": "AC-001-02",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-04",
+      "description": "GET /api/v1/meetings/:id returns a single meeting",
+      "verifiesAc": "AC-001-02",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-05",
+      "description": "PUT /api/v1/meetings/:id updates the meeting fields",
+      "verifiesAc": "AC-001-03",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-06",
+      "description": "DELETE /api/v1/meetings/:id removes the meeting and returns 204",
+      "verifiesAc": "AC-001-04",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-07",
+      "description": "GET /api/v1/meetings/:id returns 404 for non-existent meeting",
+      "verifiesAc": "AC-001-02",
+      "status": "passing"
+    },
+    {
+      "id": "TC-001-08",
+      "description": "HTML shell loads and contains app container and navigation",
+      "verifiesAc": "AC-001-02",
+      "status": "passing"
+    }
+  ],
+  "testFile": "src/tests/meetings.test.mjs",
+  "status": "passed",
+  "created": "2026-05-27T10:30:00.000Z",
+  "updated": "2026-05-27T10:45:00.000Z"
+}

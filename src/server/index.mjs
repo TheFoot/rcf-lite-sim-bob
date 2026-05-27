@@ -1,14 +1,17 @@
+/**
+ * Meeting Notes -- Express server entry point.
+ * Traces: REQ-001, REQ-002, REQ-003, REQ-004
+ */
+
 import express from 'express';
 import helmet from 'helmet';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { Router } from 'express';
-import { registerProjectRoutes } from './routes/projects.mjs';
-import { registerTemplateRoutes } from './routes/templates.mjs';
-import { registerSectionRoutes } from './routes/sections.mjs';
-import { registerDashboardRoutes } from './routes/dashboard.mjs';
-import { registerExportRoutes } from './routes/export.mjs';
+import { registerMeetingRoutes } from './routes/meetings.mjs';
+import { errorHandler } from './middleware/error-handler.mjs';
+import { rateLimiter } from './middleware/rate-limiter.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,7 +42,7 @@ app.use(helmet({
 
 app.use(express.json());
 
-// CORS -- allow same-origin by default; loosen in dev if needed
+// CORS
 app.use((_req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
@@ -54,16 +57,12 @@ app.use((_req, res, next) => {
 
 app.use(express.static(join(__dirname, '..', 'public')));
 
-// Serve marked library from node_modules for client-side markdown rendering
-app.get('/vendor/marked.min.mjs', (_req, res) => {
-  res.sendFile(join(__dirname, '..', '..', 'node_modules', 'marked', 'lib', 'marked.esm.js'));
-});
-
 // ---------------------------------------------------------------------------
 // API routes
 // ---------------------------------------------------------------------------
 
 const apiRouter = Router();
+apiRouter.use(rateLimiter);
 
 app.get('/api/v1/health', (_req, res) => {
   res.json({
@@ -72,16 +71,12 @@ app.get('/api/v1/health', (_req, res) => {
   });
 });
 
-registerProjectRoutes(apiRouter);
-registerTemplateRoutes(apiRouter);
-registerSectionRoutes(apiRouter);
-registerDashboardRoutes(apiRouter);
-registerExportRoutes(apiRouter);
+registerMeetingRoutes(apiRouter);
 
 app.use('/api/v1', apiRouter);
 
 // ---------------------------------------------------------------------------
-// SPA fallback -- serve index.html for any non-API, non-static route
+// SPA fallback
 // ---------------------------------------------------------------------------
 
 app.get('*', (_req, res) => {
@@ -92,10 +87,7 @@ app.get('*', (_req, res) => {
 // Error handler
 // ---------------------------------------------------------------------------
 
-app.use((err, _req, res, _next) => {
-  console.error(`[ERROR] ${_req.method} ${_req.url}:`, err.message);
-  res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred.' } });
-});
+app.use(errorHandler);
 
 // ---------------------------------------------------------------------------
 // Start
