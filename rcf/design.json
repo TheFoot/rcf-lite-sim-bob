@@ -1,0 +1,111 @@
+{
+  "overview": "Meeting Notes is a vanilla JS SPA backed by Express.js with flat-file JSON persistence. Two core entities -- Meeting and ActionItem -- with a one-to-many relationship (a meeting has many action items). The frontend uses client-side routing with a dashboard landing page, meeting list/detail/form views, and action item management within meeting context. Search and filtering are implemented client-side for speed.",
+  "created": "2026-05-27T10:15:00.000Z",
+  "updated": "2026-05-27T10:15:00.000Z",
+  "components": [
+    {
+      "name": "Meeting API",
+      "purpose": "REST API for meeting CRUD operations with JSON flat-file persistence",
+      "tracesTo": ["REQ-001"],
+      "technology": "Express.js 4.x with flat JSON file storage",
+      "files": ["src/server/routes/meetings.mjs"]
+    },
+    {
+      "name": "Action Item API",
+      "purpose": "REST API for action item CRUD operations, linked to meetings via meetingId",
+      "tracesTo": ["REQ-002"],
+      "technology": "Express.js 4.x with flat JSON file storage",
+      "files": ["src/server/routes/action-items.mjs"]
+    },
+    {
+      "name": "Dashboard API",
+      "purpose": "Aggregation endpoint returning meeting stats, recent meetings, and upcoming action items",
+      "tracesTo": ["REQ-003"],
+      "technology": "Express.js 4.x",
+      "files": ["src/server/routes/dashboard.mjs"]
+    },
+    {
+      "name": "Meeting UI Components",
+      "purpose": "Frontend components for meeting list cards, detail view, and create/edit forms",
+      "tracesTo": ["REQ-001"],
+      "technology": "Vanilla JS ES modules",
+      "files": [
+        "src/public/js/components/meeting-card.mjs",
+        "src/public/js/components/meeting-detail.mjs",
+        "src/public/js/components/meeting-form.mjs",
+        "src/public/js/services/meetings-api.mjs"
+      ]
+    },
+    {
+      "name": "Action Item UI Components",
+      "purpose": "Frontend components for action item cards, detail view, and forms within meeting context",
+      "tracesTo": ["REQ-002"],
+      "technology": "Vanilla JS ES modules",
+      "files": [
+        "src/public/js/components/action-item-card.mjs",
+        "src/public/js/components/action-item-detail.mjs",
+        "src/public/js/components/action-item-form.mjs",
+        "src/public/js/services/action-items-api.mjs"
+      ]
+    },
+    {
+      "name": "Dashboard View",
+      "purpose": "Landing page component showing meeting stats, recent meetings, and upcoming action items",
+      "tracesTo": ["REQ-003"],
+      "technology": "Vanilla JS ES modules",
+      "files": ["src/public/js/components/dashboard-view.mjs"]
+    },
+    {
+      "name": "SPA Router and App Shell",
+      "purpose": "Client-side routing, navigation, and app bootstrap",
+      "tracesTo": ["REQ-001", "REQ-002", "REQ-003", "REQ-004"],
+      "technology": "Vanilla JS History API router",
+      "files": ["src/public/js/app.mjs", "src/public/js/router.mjs", "src/public/index.html"]
+    },
+    {
+      "name": "Search and Filter",
+      "purpose": "Client-side search on meetings list and status/assignee filtering on action items",
+      "tracesTo": ["REQ-004"],
+      "technology": "Vanilla JS",
+      "files": ["src/public/js/app.mjs"]
+    }
+  ],
+  "endpoints": [
+    { "method": "GET", "path": "/api/v1/meetings", "purpose": "List all meetings", "tracesTo": "REQ-001" },
+    { "method": "GET", "path": "/api/v1/meetings/:id", "purpose": "Get a single meeting", "tracesTo": "REQ-001" },
+    { "method": "POST", "path": "/api/v1/meetings", "purpose": "Create a meeting", "tracesTo": "REQ-001" },
+    { "method": "PUT", "path": "/api/v1/meetings/:id", "purpose": "Update a meeting", "tracesTo": "REQ-001" },
+    { "method": "DELETE", "path": "/api/v1/meetings/:id", "purpose": "Delete a meeting and its action items", "tracesTo": "REQ-001" },
+    { "method": "GET", "path": "/api/v1/action-items", "purpose": "List all action items (optional meetingId filter)", "tracesTo": "REQ-002" },
+    { "method": "GET", "path": "/api/v1/action-items/:id", "purpose": "Get a single action item", "tracesTo": "REQ-002" },
+    { "method": "POST", "path": "/api/v1/action-items", "purpose": "Create an action item", "tracesTo": "REQ-002" },
+    { "method": "PUT", "path": "/api/v1/action-items/:id", "purpose": "Update an action item", "tracesTo": "REQ-002" },
+    { "method": "DELETE", "path": "/api/v1/action-items/:id", "purpose": "Delete an action item", "tracesTo": "REQ-002" },
+    { "method": "GET", "path": "/api/v1/dashboard", "purpose": "Dashboard summary data", "tracesTo": "REQ-003" }
+  ],
+  "dataModel": [
+    {
+      "entity": "Meeting",
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "UUID primary key" },
+        { "name": "title", "type": "string", "required": true, "description": "Meeting title" },
+        { "name": "date", "type": "string", "required": true, "description": "Meeting date (ISO format)" },
+        { "name": "attendees", "type": "string", "required": false, "description": "Comma-separated list of attendee names" },
+        { "name": "notes", "type": "string", "required": false, "description": "Meeting notes content" },
+        { "name": "createdAt", "type": "string", "required": true, "description": "Creation timestamp" }
+      ]
+    },
+    {
+      "entity": "ActionItem",
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "UUID primary key" },
+        { "name": "meetingId", "type": "string", "required": true, "description": "Foreign key to meeting" },
+        { "name": "title", "type": "string", "required": true, "description": "Action item title" },
+        { "name": "assignee", "type": "string", "required": false, "description": "Person responsible" },
+        { "name": "dueDate", "type": "string", "required": false, "description": "Due date (ISO format)" },
+        { "name": "status", "type": "string", "required": true, "description": "Status: open, in-progress, done" },
+        { "name": "createdAt", "type": "string", "required": true, "description": "Creation timestamp" }
+      ]
+    }
+  ]
+}

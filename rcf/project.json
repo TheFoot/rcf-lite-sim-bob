@@ -1,9 +1,9 @@
 {
   "name": "Meeting Notes",
   "description": "Capture, organize, and track action items from team meetings",
-  "phase": "defined",
+  "phase": "designed",
   "created": "2026-05-27T10:00:00.000Z",
-  "updated": "2026-05-27T10:10:00.000Z",
+  "updated": "2026-05-27T10:20:00.000Z",
   "ports": {
     "app": 3000,
     "dashboard": 3001
@@ -12,7 +12,7 @@
     "requirements": 4,
     "stories": 4,
     "acceptanceCriteria": 12,
-    "buildSpecs": 0,
+    "buildSpecs": 4,
     "buildSpecsVerified": 0,
     "testsPassing": 0,
     "testsTotal": 0
